@@ -14,7 +14,7 @@ export function WelcomeHeader() {
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold">
-          Welcome back, Chaitanya!
+          Welcome back, Frank!
         </h1>
         <p className="text-gray-600 mt-2">
           You're making great progress on your projects. Keep up the good work!
