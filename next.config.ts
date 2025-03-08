@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  middleware: ['lib/middleware.ts'],
 };
 
 export default nextConfig;
