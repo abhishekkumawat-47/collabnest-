@@ -1,23 +1,26 @@
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
+    //extensions = [pgcrypto] //No need to add this line 
 }
 
 model User {
-    id                       Int       @id @default(autoincrement())
+    id                       String    @id @default(uuid()) @db.Uuid
     username                 String    @unique
     name                     String
-    roll                     String    @unique
+    roll                     String?   @unique
     email                    String    @unique
     password                 String
     role                     Role      @default(USER)
     rating                   Int       @default(0)
     degree                   String?
     year                     String?
+    branch                   String?
     department               String
     picture                  String?
     accountCreatedAt         DateTime  @default(now())
@@ -38,21 +41,21 @@ enum Role {
 }
 
 model Project {
-    id                 Int       @id @default(autoincrement())
-    authorId           Int
+    id                 String        @id @default(uuid()) @db.Uuid
+    authorId           String        @db.Uuid
     title              String
     subheading         String?
     description        String?
-    status             Status    @default(OPEN)
+    status             Status        @default(OPEN)
     deadlineToApply    DateTime?
     deadlineToComplete DateTime?
-    difficultyTag      String
+    difficultyTag      DifficultyTag
     requirementTags    Json[]
-    applicantCapacity  Int       @default(100)
-    selectionCapacity  Int       @default(10)
+    applicantCapacity  Int           @default(100)
+    selectionCapacity  Int           @default(10)
     projectResources   Json[]
-    createdAt          DateTime  @default(now())
-    updatedAt          DateTime  @updatedAt
+    createdAt          DateTime      @default(now())
+    updatedAt          DateTime      @updatedAt
 
     // relations
     applications Application[]
@@ -65,10 +68,16 @@ enum Status {
     CLOSED
 }
 
+enum DifficultyTag {
+    BEGINNER
+    INTERMEDIATE
+    ADVANCED
+}
+
 model Application {
-    id                Int               @id @default(autoincrement())
-    projectId         Int
-    applicantId       Int
+    id                String            @id @default(uuid()) @db.Uuid
+    projectId         String            @db.Uuid
+    applicantId       String            @db.Uuid
     dateOfApplication DateTime          @default(now())
     status            ApplicationStatus @default(PENDING)
 
@@ -84,9 +93,9 @@ enum ApplicationStatus {
 }
 
 model ProjectMember {
-    id        Int @id @default(autoincrement())
-    projectId Int
-    userId    Int
+    id        String @id @default(uuid()) @db.Uuid
+    projectId String @db.Uuid
+    userId    String @db.Uuid
 
     // relations
     project Project @relation(fields: [projectId], references: [id])
