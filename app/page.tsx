@@ -1,11 +1,8 @@
-import Image from "next/image";
-export default function Home() {
-  return (
-    <div>
+import React from "react";
+import Loader from "@/components/Loader";
 
-      {/* <LandingPage /> */}
-      
-      
-    </div>
-  );
-}
+const HomePage = () => {
+  return <Loader />;
+};
+
+export default HomePage;

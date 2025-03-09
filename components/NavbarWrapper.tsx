@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 export default function NavbarWrapper() {
   const pathname = usePathname();
-  const showNavbar = pathname !== '/welcome';
+  const showNavbar = pathname !== '/welcome' && pathname !== '/';
 
   return (
     <>

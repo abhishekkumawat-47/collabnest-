@@ -40,8 +40,8 @@ const Discovery = () => {
         <>
 
             <div className="mx-5">
-                <h1 className='text-3xl mt-5 font-bold'>Discover Recommended Projects</h1>
-                <p className='text-gray-900'>Browse projects from professors and research groups across various domains.</p>
+                <h1 className='text-3xl mt-5 mb-1 font-bold'>Discover Recommended Projects</h1>
+                <p className='text-muted-foreground'>Browse projects from professors and research groups across various domains.</p>
 
                 <Input type="text" placeholder="Search projects, skills, professors..." className="w-100 my-4" />
                 <div className='flex flex-row space-x-4'>
