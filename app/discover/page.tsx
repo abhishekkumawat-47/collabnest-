@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { use, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,6 +37,21 @@ const projects = [
 ];
 
 const Discovery = () => {
+
+    const [userType, setUserType] = useState<string | null>('1'); 
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const user = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('userType='))
+                ?.split('=')[1] || '1';
+            setUserType(user);
+        }
+    }, []);
+    
+    if (userType === null) return null; 
+
     return (
         <>
 
@@ -107,7 +123,10 @@ const Discovery = () => {
                                 <p className="text-gray-600 text-sm">{project.timeCommitment}&nbsp;&nbsp;{project.duration}</p>
                             </CardContent>
                             <CardFooter className="flex justify-end space-x-2">
-                            <Button variant="outline" className="w-auto bg-black text-white">Apply</Button>
+                            {
+                            userType === '1' && 
+                            (<Button variant="outline" className="w-auto bg-black text-white">Apply</Button>)
+                            }
                                 <Button variant="outline" className="w-auto flex items-center">
                                     <FaStar className="mr-0.5" /> Star
                                 </Button>
@@ -121,3 +140,7 @@ const Discovery = () => {
 };
 
 export default Discovery;
+
+function parseCookies() {
+    throw new Error('Function not implemented.');
+}

@@ -8,6 +8,7 @@ import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 
 export default function Dashboard() {
   return (
+    
     <div className="container mx-auto py-8 px-4 md:px-8">
         <WelcomeHeader />
         <div className="grid md:grid-cols-3 gap-6">
