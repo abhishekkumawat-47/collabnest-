@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const userType = request.cookies.get('userType')?.value;
   // Replace this with actual user type fetching logic
-  
+ 
 
   if (!userType) {
     return NextResponse.redirect(new URL('/login', request.url));
@@ -17,12 +17,12 @@ export function middleware(request: NextRequest) {
   const requestedPath = new URL(request.url).pathname;
 
   // Admin-only routes
-  if (adminRoutes.includes(requestedPath) && userType !== "2") {
+  if (adminRoutes.includes(requestedPath) && userType !== '2') {
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
   // Moderator-only routes
-  if (moderatorRoutes.includes(requestedPath) && userType !== "3") {
+  if (moderatorRoutes.includes(requestedPath) && userType !== '3') { // Fix syntax error here
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
