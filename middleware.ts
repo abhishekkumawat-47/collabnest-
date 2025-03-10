@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Define role-based route protection
-  const adminRoutes = ['/admin/dashboard', '/admin/settings', '/leaderboard'];
+  const adminRoutes = ['/admin/dashboard', '/admin/settings'];
   const moderatorRoutes = ['/moderator/reports', '/moderator/manage'];
 
   const requestedPath = new URL(request.url).pathname;
@@ -33,6 +33,6 @@ export const config = {
   matcher: [
     '/admin/:path*',  
     '/moderator/:path*', 
-    '/leaderboard'
+    
   ],
 };
