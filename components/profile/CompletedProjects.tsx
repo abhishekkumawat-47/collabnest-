@@ -31,7 +31,7 @@ export const CompletedProjects = () => {
         {projectData.map((project, index) => (
           <div 
             key={index} 
-            className="flex justify-between items-center py-4 border-b last:border-b-0"
+            className="flex justify-between items-center py-4 border-b last:border-b-0 gap-3"
           >
             <div>
               <div className="font-medium">{project.title}</div>
@@ -44,9 +44,9 @@ export const CompletedProjects = () => {
                 ))}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="default">{project.status}</Badge>
-              <span className="text-sm text-muted-foreground">{project.date}</span>
+            <div className="flex flex-col items-center lg:space-x-2 lg:flex-row gap-y-2">
+              
+              <span className="text-sm text-center text-muted-foreground">{project.date}</span>
               <Button variant="outline" size="icon">
                 <Eye className="h-4 w-4" />
               </Button>

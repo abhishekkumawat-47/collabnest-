@@ -13,7 +13,7 @@ export const ProfileHeader = () => {
         </Avatar>
         <div>
           <h1 className="text-2xl font-bold">Frank Ocean</h1>
-          <p className="text-muted-foreground">Computer Science Engineering</p>
+          <p className="text-muted-foreground text-sm">Computer Science Engineering</p>
           <p className="text-sm text-muted-foreground">frank.ocean@college.edu</p>
         </div>
       </div>

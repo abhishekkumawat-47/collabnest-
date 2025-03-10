@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -99,7 +100,7 @@ export default function Navbar() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="right" className="p-5">
+          <SheetContent side="right" aria-describedby={undefined} className="p-5">
             <SheetHeader>
               <SheetTitle className="text-2xl">Menu</SheetTitle>
             </SheetHeader>
