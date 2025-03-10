@@ -9,8 +9,7 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
     ];
-  },
-  middleware: ['lib/middleware.ts'],
+  }
 };
 
 export default nextConfig;
