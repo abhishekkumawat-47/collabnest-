@@ -1,18 +1,26 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useRive } from "rive-react";
+import {  useRouter , usePathname  } from "next/navigation";
+
+import { useRive} from "rive-react";
+
 
 const Loader = () => {
   const router = useRouter();
+  //current pathname by next/navigation
+  const pathname = usePathname();
+  console.log(pathname);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push("/welcome");
-    }, 4000); // Adjust the duration as needed
-
-    return () => clearTimeout(timer);
+  
+  useEffect(() => { // redirect to "/welcome" only if current pathname is "/"
+    if (pathname==="/") {
+      const timer = setTimeout(() => {
+        router.push("/welcome");
+      }, 1500); // Adjust the duration as needed
+      return () => clearTimeout(timer);
+      
+    }
   }, [router]);
 
   const { RiveComponent } = useRive({
