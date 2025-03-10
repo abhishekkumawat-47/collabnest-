@@ -49,13 +49,13 @@ export const UserDetails = () => {
         <CardTitle>Personal Information</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid xl:grid-cols-2 gap-4">
           {detailsData.map((detail) => (
             <div key={detail.label} className="flex items-center space-x-3">
-              <detail.icon className="h-5 w-5 text-muted-foreground" />
+              <detail.icon className="h-5 w-5 min-w-5 text-muted-foreground" />
               <div>
                 <div className="text-sm text-muted-foreground">{detail.label}</div>
-                <div className="font-medium">{detail.value}</div>
+                <div className={detail.label=="Email"?"font-medium break-all":"font-medium"}>{detail.value}</div>
               </div>
             </div>
           ))}
