@@ -131,7 +131,7 @@ async function generateProjects() {
                 title: `Project ${i}`,
                 subheading: `Subheading for Project ${i}`,
                 description: `This is a sample description for Project ${i}.`,
-                difficultyTag: difficulties[Math.floor(Math.random() * difficulties.length)],
+                difficultyTag: difficulties[Math.floor(Math.random() * difficulties.length)] as 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED',
                 // requirementTags: tags,
                 requirementTags: [
                     tags[Math.floor(Math.random() * tags.length)].toString(),

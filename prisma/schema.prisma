@@ -45,11 +45,22 @@ model Project {
     selectionCapacity  Int             @default(10)
     requirementTags    String[]
     projectResources   Json[]
+    subtasks           Subtask[]        // Updated attribute
     createdAt          DateTime        @default(now())
     updatedAt          DateTime        @updatedAt
     applications       Application[]
     author             User            @relation("ProjectAuthor", fields: [authorId], references: [id])
     members            ProjectMember[]
+}
+
+model Subtask {
+    id          String   @id @default(uuid()) @db.Uuid
+    title       String
+    description String?
+    status      Status    @default(OPEN)
+    deadline    DateTime?
+    projectId   String    @db.Uuid
+    project     Project   @relation(fields: [projectId], references: [id])
 }
 
 model Application {
