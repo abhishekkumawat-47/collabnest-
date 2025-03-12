@@ -7,7 +7,8 @@
         "dev": "next dev --turbopack",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "nodemon": "nodemon --watch . --ext ts,json --exec tsx index.ts"
     },
     "prisma": {
         "schema": "prisma/schema.prisma",
@@ -27,6 +28,7 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "date-fns": "^4.1.0",
+        "express": "^4.21.2",
         "lucide-react": "^0.477.0",
         "next": "15.2.0",
         "next-themes": "^0.4.4",
@@ -42,11 +44,13 @@
     "devDependencies": {
         "@eslint/eslintrc": "^3",
         "@tailwindcss/postcss": "^4",
+        "@types/express": "^5.0.0",
         "@types/node": "^20.17.24",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "eslint": "^9",
         "eslint-config-next": "15.2.0",
+        "nodemon": "^3.1.9",
         "tailwindcss": "^4",
         "ts-node": "^10.9.2",
         "tsx": "^4.19.3",

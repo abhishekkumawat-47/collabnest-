@@ -1,5 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+// npx prisma db seed
+
+import prisma from '../config/prismaClient';
 
 const students = [
     { name: 'Alice Verma', degree: 'BTech', year: '2024', branch: 'CS', serial: '01' },
