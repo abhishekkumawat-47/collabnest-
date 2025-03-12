@@ -156,9 +156,16 @@ const Discovery = () => {
     if (searchQuery.trim() === "") {
       setProjects(allProjects); // Reset to all projects if search query is empty
     } else {
-      const result = allProjects.filter((project) =>
-        project.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const result = allProjects.filter((project) => {
+        const query = searchQuery.toLowerCase();
+        return (
+          project.title.toLowerCase().includes(query) ||
+          project.description.toLowerCase().includes(query) ||
+          project.requirementTags.some((tag) =>
+            tag.toLowerCase().includes(query)
+          )
+        );
+      });
 
       setProjects(result.length > 0 ? result : []); // Set to empty array if no match
     }
@@ -174,7 +181,7 @@ const Discovery = () => {
           Browse projects from professors and research groups across various
           domains.
         </p>
-        <Input //currently work independtly from filters if search then filter not active
+        <Input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
