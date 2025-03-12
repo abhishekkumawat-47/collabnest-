@@ -36,24 +36,26 @@ const detailsData = [
 ];
 
 export const UserDetails = () => {
-    return (
-        <Card className="mb-6">
-            <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="grid md:grid-cols-2 gap-4">
-                    {detailsData.map((detail) => (
-                        <div key={detail.label} className="flex items-center space-x-3">
-                            <detail.icon className="h-5 w-5 text-muted-foreground" />
-                            <div>
-                                <div className="text-sm text-muted-foreground">{detail.label}</div>
-                                <div className="font-medium">{detail.value}</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
-    );
+
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Personal Information</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid xl:grid-cols-2 gap-4">
+          {detailsData.map((detail) => (
+            <div key={detail.label} className="flex items-center space-x-3">
+              <detail.icon className="h-5 w-5 min-w-5 text-muted-foreground" />
+              <div>
+                <div className="text-sm text-muted-foreground">{detail.label}</div>
+                <div className={detail.label=="Email"?"font-medium break-all":"font-medium"}>{detail.value}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
 };
+

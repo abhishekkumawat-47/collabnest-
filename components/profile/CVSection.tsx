@@ -9,7 +9,7 @@ export const CVSection = () => {
       <CardHeader>
         <CardTitle>Curriculum Vitae</CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-between items-center">
+      <CardContent className="flex flex-wrap gap-x-2 gap-y-4 justify-between items-center">
         <div>
           <div className="font-medium">Latest CV/Resume</div>
           <div className="text-sm text-muted-foreground">
