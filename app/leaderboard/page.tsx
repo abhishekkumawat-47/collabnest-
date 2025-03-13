@@ -4,17 +4,6 @@ import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable';
 import { Card, CardContent } from "@/components/ui/card";
 
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import {CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-
-
 const mockLeaderboardData = [
   {
     id: '1',

@@ -15,8 +15,8 @@ const ProfessorProjectsPage = () => {
       id: 'RL-2025-003',
       title: 'Autonomous Robot Navigation using Deep RL',
       status: 'Active',
-      studentsFilled: 5,
-      studentsTotal: 6,
+      selectionCapacity: 5,
+      applicantCapacity: 6,
       mentor: 'Dr. Anita Kumar',
       applications: [
         { id: 'app1', name: 'Raj Patel', avatar: 'R', date: 'Mar 10, 2025', status: 'Pending' },
@@ -27,8 +27,8 @@ const ProfessorProjectsPage = () => {
       id: 'AI-2025-012',
       title: 'AI-Driven Climate Data Analysis',
       status: 'Active',
-      studentsFilled: 4,
-      studentsTotal: 4,
+      selectionCapacity: 4,
+      applicantCapacity: 4,
       mentor: 'Self-mentored',
       applications: [
         { id: 'app3', name: 'James Wilson', avatar: 'J', date: 'Mar 8, 2025', status: 'Pending' }
@@ -45,13 +45,16 @@ const ProfessorProjectsPage = () => {
           applications: project.applications.map(app => 
             app.id === appId ? {...app, status: newStatus} : app
           ),
-          studentsFilled: newStatus === 'Accepted' && project.studentsFilled < project.studentsTotal ? 
-            project.studentsFilled + 1 : project.studentsFilled
+          selectionCapacity: newStatus === 'Accepted' && project.selectionCapacity < project.applicantCapacity ? 
+            project.selectionCapacity + 1 : project.selectionCapacity
         };
       }
       return project;
     }));
   };
+
+
+
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -79,7 +82,7 @@ const ProfessorProjectsPage = () => {
                     </div>
                     <div className="text-sm text-gray-500 flex flex-wrap gap-x-6 gap-y-1">
                       <span>Project ID: {project.id}</span>
-                      <span>Students: {project.studentsFilled}/{project.studentsTotal} positions filled</span>
+                      <span>Students: {project.selectionCapacity}/{project.applicantCapacity} positions filled</span>
                       <span>Mentor: {project.mentor}</span>
                     </div>
                   </div>
@@ -143,7 +146,7 @@ const ProfessorProjectsPage = () => {
                                 <div className="flex gap-2">
                                   <Button 
                                     size="sm"
-                                    disabled={project.studentsFilled >= project.studentsTotal}
+                                    disabled={project.selectionCapacity >= project.applicantCapacity}
                                     onClick={() => handleApplicationStatus(project.id, app.id, 'Accepted')}
                                   >
                                     Accept
