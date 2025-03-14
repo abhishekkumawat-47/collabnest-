@@ -45,16 +45,16 @@ model Project {
     selectionCapacity  Int             @default(10)
     requirementTags    String[]
     projectResources   Json[]
-    subtasks           Subtask[]        // Updated attribute
     createdAt          DateTime        @default(now())
     updatedAt          DateTime        @updatedAt
     applications       Application[]
     author             User            @relation("ProjectAuthor", fields: [authorId], references: [id])
     members            ProjectMember[]
+    subtasks           Subtask[]
 }
 
 model Subtask {
-    id          String   @id @default(uuid()) @db.Uuid
+    id          String    @id @default(uuid()) @db.Uuid
     title       String
     description String?
     status      Status    @default(OPEN)
@@ -90,6 +90,7 @@ enum Role {
 enum Status {
     OPEN
     CLOSED
+    IN_PROGRESS
 }
 
 enum DifficultyTag {
