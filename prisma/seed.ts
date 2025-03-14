@@ -131,7 +131,7 @@ async function generateProjects() {
                 title: `Project ${i}`,
                 subheading: `Subheading for Project ${i}`,
                 description: `This is a sample description for Project ${i}.`,
-                difficultyTag: difficulties[Math.floor(Math.random() * difficulties.length)] as 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED',
+                difficultyTag: difficulties[Math.floor(Math.random() * difficulties.length)],
                 // requirementTags: tags,
                 requirementTags: [
                     tags[Math.floor(Math.random() * tags.length)].toString(),
@@ -158,6 +158,132 @@ async function generateProjects() {
         });
     }
 }
+async function generateProjectMembers() {
+    const users = await prisma.user.findMany({
+        where: { role: 'USER' },
+    });
+
+    const projects = await prisma.project.findMany();
+
+    if (users.length === 0 || projects.length === 0) {
+        console.log('No users or projects found. Skipping project member generation.');
+        return;
+    }
+
+    for (const project of projects) {
+        // Assign 3–6 random students per project
+        const numMembers = Math.floor(Math.random() * 4) + 3; // 3 to 6 members
+        const shuffledUsers = users.sort(() => 0.5 - Math.random()).slice(0, numMembers);
+
+        for (const user of shuffledUsers) {
+            try {
+                await prisma.projectMember.create({
+                    data: {
+                        userId: user.id,
+                        projectId: project.id,
+                    },
+                });
+
+                const existingApp = await prisma.application.findFirst({
+                    where: {
+                        applicantId: user.id,
+                        projectId: project.id,
+                    },
+                });
+
+                if (existingApp) {
+                    await prisma.application.update({
+                        where: { id: existingApp.id },
+                        data: { status: 'ACCEPTED' },
+                    });
+                } else {
+                    await prisma.application.create({
+                        data: {
+                            applicantId: user.id,
+                            projectId: project.id,
+                            status: 'ACCEPTED',
+                        },
+                    });
+                }
+            } catch (e) {
+                // Prevent duplicate assignments or other errors from crashing seeding
+                console.warn(`Skipping duplicate/failed member for project ${project.id}: ${user.id}`);
+            }
+        }
+    }
+}
+
+async function generateApplications() {
+    const users = await prisma.user.findMany({
+        where: { role: 'USER' },
+    });
+
+    const projects = await prisma.project.findMany();
+
+    if (users.length === 0 || projects.length === 0) {
+        console.log('No users or projects found. Skipping application generation.');
+        return;
+    }
+
+    const statuses: Array<'PENDING' | 'ACCEPTED' | 'REJECTED'> = ['PENDING', 'ACCEPTED', 'REJECTED'];
+
+    for (const user of users) {
+        // Each user applies to 0-2 random projects
+        const numApplications = Math.floor(Math.random() * 2) + 0;
+        const shuffledProjects = projects.sort(() => 0.5 - Math.random()).slice(0, numApplications);
+
+        for (const project of shuffledProjects) {
+            try {
+                await prisma.application.create({
+                    data: {
+                        applicantId: user.id,
+                        projectId: project.id,
+                    },
+                });
+            } catch (e) {
+                // Handle duplicates or foreign key constraints gracefully
+                // console.warn(`Skipping duplicate/failed application for project ${project.id} by user ${user.id}`);
+                console.log(e);
+            }
+        }
+    }
+}
+
+async function goThrough() {
+    const users = await prisma.user.findMany({
+        where: { role: 'USER' },
+    });
+
+    const projects = await prisma.project.findMany();
+
+    // Ensure an ACCEPTED application exists
+
+    for (const user of users) {
+        for (const project of projects) {
+            const existingApp = await prisma.application.findFirst({
+                where: {
+                    applicantId: user.id,
+                    projectId: project.id,
+                },
+            });
+
+            if (existingApp) {
+                await prisma.application.update({
+                    where: { id: existingApp.id },
+                    data: { status: 'ACCEPTED' },
+                });
+            } else {
+                await prisma.application.create({
+                    data: {
+                        applicantId: user.id,
+                        projectId: project.id,
+                        status: 'ACCEPTED',
+                    },
+                });
+            }
+        }
+    }
+}
 
 async function main() {
     await add_students()
@@ -173,6 +299,16 @@ async function main() {
     await generateProjects()
         .then(() => console.log('Projects seeded successfully!'))
         .catch((e) => console.error(e));
+    await generateApplications()
+        .then(() => console.log('Applications seeded successfully!'))
+        .catch((e) => console.error(e));
+
+    await generateProjectMembers()
+        .then(() => console.log('Project members seeded successfully!'))
+        .catch((e) => console.error(e));
+    // await goThrough()
+    //     .then(() => console.log('Applications goThrough seeded successfully!'))
+    //     .catch((e) => console.error(e));
 }
 
 main()
