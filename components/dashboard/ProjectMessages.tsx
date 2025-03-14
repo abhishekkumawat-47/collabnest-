@@ -3,40 +3,71 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-
 export function ProjectMessages() {
   const messages = [
-    { avatar: 'O', name: 'Olivia (Mentor)', message: 'Hey, did you complete it?', time: '1h ago' },
-    { avatar: 'J', name: 'Jackson Lee', message: 'Almost! Just running final checks w...', time: '1h ago' },
-    { avatar: 'I', name: 'Isabella.nguyen@email.com', message: 'Nice! Share the update in the task t...', time: '1h ago' },
-    { avatar: 'W', name: 'will@email.com', message: 'William Kim', time: '1h ago' }
+    {
+      avatar: "O",
+      name: "Olivia (Mentor)",
+      message: "Hey, did you complete it?",
+      time: "1h ago",
+    },
+    {
+      avatar: "J",
+      name: "Jackson Lee",
+      message: "Almost! Just running final checks w...",
+      time: "1h ago",
+    },
+    {
+      avatar: "I",
+      name: "Isabella.nguyen@email.com",
+      message: "Nice! Share the update in the task t...",
+      time: "1h ago",
+    },
+    {
+      avatar: "W",
+      name: "will@email.com",
+      message: "William Kim",
+      time: "1h ago",
+    },
   ];
 
   return (
-    <Card className="mb-6">
+    <Card className='mb-6'>
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg font-medium">Recent Messages</CardTitle>
-          <Button variant="ghost" size="sm" className="text-sm">View All</Button>
+        <div className='flex justify-between items-center'>
+          <CardTitle className='text-lg font-medium'>Recent Messages</CardTitle>
+          <Button variant='ghost' size='sm' className='text-sm'>
+            View All
+          </Button>
         </div>
-        <p className="text-sm text-gray-500">You have 265 unread messages.</p>
+        <p className='text-sm text-gray-500'>You have 265 unread messages.</p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className='space-y-4'>
         {messages.map((msg, index) => (
-          <div key={index} className={`flex gap-3 ${index < messages.length - 1 ? 'pb-3 border-b' : ''}`}>
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-blue-600 text-white">{msg.avatar}</AvatarFallback>
+          <div
+            key={index}
+            className={`flex gap-3 ${
+              index < messages.length - 1 ? "pb-3 border-b" : ""
+            }`}>
+            <Avatar className='h-8 w-8'>
+              <AvatarFallback className='bg-blue-600 text-white'>
+                {msg.avatar}
+              </AvatarFallback>
             </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between items-start">
-                <p className="font-medium truncate">{msg.name}</p>
-                <span className="text-xs text-gray-500 shrink-0 ml-2">{msg.time}</span>
+            <div className='flex-1 min-w-0'>
+              <div className='flex justify-between items-start'>
+                <p className='font-medium truncate'>{msg.name}</p>
+                <span className='text-xs text-gray-500 shrink-0 ml-2'>
+                  {msg.time}
+                </span>
               </div>
-              <p className="text-sm text-gray-600 truncate">{msg.message}</p>
+              <p className='text-sm text-gray-600 truncate'>{msg.message}</p>
             </div>
           </div>
         ))}
-        <Button className="w-full" variant="outline">Reply to Messages</Button>
+        <Button className='w-full' variant='outline'>
+          Reply to Messages
+        </Button>
       </CardContent>
     </Card>
   );
