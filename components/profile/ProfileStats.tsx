@@ -57,19 +57,19 @@ export const ProfileStats = () => {
     {
       icon: BookOpen,
       title: "Beginner projects",
-      value: userData?.projectsParticipated?.length/3,
+      value: 0,
       color: "text-yellow-500"
     },
     {
       icon: Star,
       title: "Intermediate Projects",
-      value: userData?.projectsParticipated?.length/3,
+      value: 0,
       color: "text-blue-500"
     },
     {
       icon: Target,
       title: "Advanced Projects",
-      value: userData?.projectsParticipated?.length/3,
+      value: 0,
       color: "text-green-500"
     }
   ];

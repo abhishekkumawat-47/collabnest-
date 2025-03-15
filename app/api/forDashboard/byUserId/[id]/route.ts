@@ -3,6 +3,10 @@ import { getUserProjectsById } from '@/controllers/ForDashboard.ts';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
+        if (!params) {
+            return NextResponse.json({ error: 'Params are required' }, { status: 400 });
+        }
+
         const { id } = params;
 
         if (!id) {
