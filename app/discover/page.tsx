@@ -26,6 +26,7 @@ import {
 import { FaStar } from "react-icons/fa";
 import { Calendar } from "lucide-react";
 import Loader from "@/components/Loader";
+import { auth } from "@/auth";
 
 const Discovery = () => {
   type Status = "OPEN" | "CLOSED";
@@ -53,8 +54,12 @@ const Discovery = () => {
 
   const [loading, setLoading] = useState<boolean>(true); // Loader state
 
+  // const session = await auth();
+
   useEffect(() => {
     setLoading(true); // Start loading
+
+    // const session = await auth();
 
     fetch("/api/projects")
       .then((res) => res.json())
