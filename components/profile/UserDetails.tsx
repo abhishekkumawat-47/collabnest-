@@ -52,7 +52,7 @@ export const UserDetails = () => {
     {
       icon: Briefcase,
       label: 'Department',
-      value: 'CSE',
+      value: userData?.department || 'N/A',
     },
     {
       icon: Mail,
