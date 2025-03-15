@@ -20,7 +20,7 @@ const detailsData = [
     },
     {
         icon: Briefcase,
-        label: 'Branch',
+        label: 'Department',
         value: 'CSE',
     },
     {
