@@ -37,7 +37,7 @@ export const UserDetails = () => {
     {
       icon: MapPin,
       label: 'Name',
-      value: userData?.name || 'N/A', // Replacing "Location" with "Name"
+      value: userData?.name || 'N/A', 
     },
     {
       icon: QrCode,
