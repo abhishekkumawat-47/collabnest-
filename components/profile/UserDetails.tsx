@@ -1,48 +1,42 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  GraduationCap, 
-  Mail, 
-  MapPin, 
-  Briefcase, 
-  QrCode, 
-  University 
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { GraduationCap, Mail, MapPin, Briefcase, QrCode, University } from 'lucide-react';
 
 const detailsData = [
-  { 
-    icon: QrCode, 
-    label: "Roll No", 
-    value: "2301CS1234" 
-  },
-  { 
-    icon: University, 
-    label: "College", 
-    value: "Indian Institute of Technology, Patna" 
-  },
-  { 
-    icon: GraduationCap, 
-    label: "Degree", 
-    value: "B.Tech in Computer Science and Engineering" 
-  },
-  { 
-    icon: Briefcase, 
-    label: "Branch", 
-    value: "CSE" 
-  },
-  { 
-    icon: Mail, 
-    label: "Email", 
-    value: "frank.ocean@iitp.ac.in" 
-  },
-  { 
-    icon: MapPin, 
-    label: "Location", 
-    value: "Patna, Bihar" 
-  }
+    {
+        icon: QrCode,
+        label: 'Roll No',
+        value: '2301CS1234',
+    },
+    {
+        icon: University,
+        label: 'College',
+        value: 'Indian Institute of Technology, Patna',
+    },
+    {
+        icon: GraduationCap,
+        label: 'Degree',
+        value: 'B.Tech in Computer Science and Engineering',
+    },
+    {
+        icon: Briefcase,
+        label: 'Branch',
+        value: 'CSE',
+    },
+    {
+        icon: Mail,
+        label: 'Email',
+        value: 'frank.ocean@iitp.ac.in',
+    },
+    {
+        icon: MapPin,
+        label: 'Location',
+        value: 'Patna, Bihar',
+    },
 ];
 
 export const UserDetails = () => {
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -64,3 +58,4 @@ export const UserDetails = () => {
     </Card>
   );
 };
+

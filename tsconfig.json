@@ -8,6 +8,7 @@
         "noEmit": true,
         "esModuleInterop": true,
         "module": "esnext",
+        "allowImportingTsExtensions": true,
         "moduleResolution": "bundler",
         "resolveJsonModule": true,
         "isolatedModules": true,
@@ -22,6 +23,6 @@
             "@/*": ["./*"]
         }
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "prisma/seed.mts"],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "prisma/seed.mts", "index.mts"],
     "exclude": ["node_modules"]
 }

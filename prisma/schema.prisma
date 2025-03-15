@@ -50,6 +50,17 @@ model Project {
     applications       Application[]
     author             User            @relation("ProjectAuthor", fields: [authorId], references: [id])
     members            ProjectMember[]
+    subtasks           Subtask[]
+}
+
+model Subtask {
+    id          String    @id @default(uuid()) @db.Uuid
+    title       String
+    description String?
+    status      Status    @default(OPEN)
+    deadline    DateTime?
+    projectId   String    @db.Uuid
+    project     Project   @relation(fields: [projectId], references: [id])
 }
 
 model Application {
@@ -79,6 +90,7 @@ enum Role {
 enum Status {
     OPEN
     CLOSED
+    IN_PROGRESS
 }
 
 enum DifficultyTag {

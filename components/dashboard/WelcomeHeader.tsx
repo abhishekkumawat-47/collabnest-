@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { ProjectMember, Project } from "@/types/leaderboard";
 import { ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
@@ -8,35 +11,52 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
-export function WelcomeHeader() {
-    return(
-  <div className="mb-6">
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold">
-          Welcome back, Frank!
-        </h1>
-        <p className="text-gray-600 mt-2">
-          You're making great progress on your projects. Keep up the good work!
-        </p>
+export function WelcomeHeader({
+  current,
+  projectData,
+  onProjectChange,
+}: {
+  current: Project;
+  projectData: Project[];
+  onProjectChange: (project: Project) => void;
+}) {
+  // Replace this with the actual user ID
+
+  // Filter projects associated with the user
+
+  // Initialize curr_proj to the first project (if available)
+
+  return (
+    <div className='mb-6'>
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
+        <div>
+          <h1 className='text-2xl sm:text-3xl font-bold'>
+            Welcome back, Frank!
+          </h1>
+          <p className='text-gray-600 mt-2'>
+            You're making great progress on your projects. Keep up the good
+            work!
+          </p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='outline' className='text-zinc-500 shrink-0'>
+              {current ? current.title : "Switch Projects"}{" "}
+              <ChevronDown className='ml-2 h-4 w-4' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            {projectData.map((proj) => (
+              <DropdownMenuItem
+                key={proj.id}
+                onSelect={() => onProjectChange(proj)} // Update the current project on selection
+              >
+                {proj.title}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="text-zinc-500 shrink-0 ">
-            Switch Projects <ChevronDown className="ml-2 h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-         
-            <DropdownMenuItem
-              
-            >
-              Project title
-            </DropdownMenuItem>
-          
-        </DropdownMenuContent>
-      </DropdownMenu>
     </div>
-  </div>
   );
 }

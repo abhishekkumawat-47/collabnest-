@@ -156,13 +156,51 @@ const Discovery = () => {
     if (searchQuery.trim() === "") {
       setProjects(allProjects); // Reset to all projects if search query is empty
     } else {
-      const result = allProjects.filter((project) =>
-        project.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const result = allProjects.filter((project) => {
+        const query = searchQuery.toLowerCase();
+        return (
+          project.title.toLowerCase().includes(query) ||
+          project.description.toLowerCase().includes(query) ||
+          project.requirementTags.some((tag) =>
+            tag.toLowerCase().includes(query)
+          )
+        );
+      });
 
       setProjects(result.length > 0 ? result : []); // Set to empty array if no match
     }
   };
+
+ // Hardcoded user ID for now
+interface ApplicationResponse {
+  message?: string;
+  error?: string;
+}
+
+async function applyForProject(projectId: string): Promise<void> {
+  try {
+    const response = await fetch("/api/applications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
+        projectId : "0d2216bc-99e5-483b-8f92-44b6ec5a247f"
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || data.message || "Application failed");
+    }
+
+    const data: ApplicationResponse = await response.json();
+    console.log(data.message);
+    alert("Project application successful!");
+  } catch (error) {
+    console.error("Error applying for project:", error);
+    alert("Failed to apply for project. Please try again later.");
+  }
+}
 
   return (
     <>
@@ -174,7 +212,7 @@ const Discovery = () => {
           Browse projects from professors and research groups across various
           domains.
         </p>
-        <Input //currently work independtly from filters if search then filter not active
+        <Input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -219,7 +257,7 @@ const Discovery = () => {
             value={selectedDifficulty || ""}
             onValueChange={setSelectedDifficulty}
           >
-            <SelectTrigger className=""> 
+            <SelectTrigger className="">
               {/* removed fixed width to make it responsive */}
               <SelectValue placeholder="Difficulty" />
             </SelectTrigger>
@@ -341,6 +379,9 @@ const Discovery = () => {
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
                   <Button
+                  onClick={()=>{
+                    applyForProject(project.id)
+                  }}
                     variant="outline"
                     className="w-auto bg-black text-white"
                   >
