@@ -1,33 +1,75 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, CalendarIcon } from "lucide-react";
 import { Project, ProjectMember, Subtask, User } from "@/types/leaderboard";
+import ContactProfessorModal from "../modals/ContactProfessorModal.tsx";
+import Link from "next/link";
+import "../../app/globals.css"; // Import global CSS
+import ProjectDetailsModal from "../modals/ProjectDetailsModal.tsx";
 
 export function ProjectOverview({ current }: { current: Project }) {
+  const [contact, setContact] = useState(false);
+  const [details, setDetails] = useState(false);
   return (
     <Card className='mb-6'>
       <CardHeader className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2'>
         <div>
           <CardTitle className='text-xl font-bold'>{current.title}</CardTitle>
           <div className='flex items-center flex-wrap gap-2 mt-2'>
-            <Badge
-              variant='secondary'
-              className='bg-gray-800 text-white hover:bg-gray-700'>
-              {current.requirementTags[0]}
-            </Badge>
+            {current.requirementTags.length > 3
+              ? current.requirementTags.slice(0, 3).map((tags) => (
+                  <Badge
+                    key={tags}
+                    variant='secondary'
+                    className='bg-gray-800 text-white hover:bg-gray-700'>
+                    {tags}
+                  </Badge>
+                ))
+              : current.requirementTags.map((tags) => (
+                  <Badge
+                    key={tags}
+                    variant='secondary'
+                    className='bg-gray-800 text-white hover:bg-gray-700'>
+                    {tags}
+                  </Badge>
+                ))}
+
             <span className='text-sm text-gray-600'>
               By {current.author.name}
             </span>
           </div>
         </div>
         <div className='flex gap-2'>
-          <Button variant='outline' size='sm'>
-            Project Details
-          </Button>
-          <Button size='sm'>Contact Prof.</Button>
+          <div className='flex gap-2'>
+            {/* <Link href={`/dashboard/${current.id}`}>
+              <Button size='sm'>View Details</Button>
+            </Link> */}
+            <Button size='sm' onClick={() => setDetails(true)}>
+              Project Details
+            </Button>
+            {details && (
+              <ProjectDetailsModal
+                isOpen={details}
+                onClose={() => setDetails(false)}
+                proj={current}
+              />
+            )}
+            <Button size='sm' onClick={() => setContact(true)}>
+              Contact Prof.
+            </Button>
+            {contact && (
+              <ContactProfessorModal
+                isOpen={contact}
+                onClose={() => setContact(false)}
+                professorData={current.author}
+                projectId={current.id}
+                projectName={current.title}
+              />
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

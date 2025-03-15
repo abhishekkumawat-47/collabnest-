@@ -10,7 +10,7 @@ import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import EditProjectManagementModal from "@/components/modals/EditProjectManagementModal";
 import EditTaskTimelineModal from "@/components/modals/EditTaskTimelineModal";
 import EditLearningMaterialsModal from "@/components/modals/EditLearningMaterialsModal";
-import { Project, ProjectMember, Subtask } from "@/types/leaderboard.ts";
+import { Project, ProjectMember, Subtask, User } from "@/types/leaderboard.ts";
 import Loader from "@/components/Loader";
 
 export default function Dashboard() {
@@ -20,7 +20,7 @@ export default function Dashboard() {
   const id = "1c1d2c2d-7d46-4cbf-8d4a-93e9e97e5600"; //user id
   const [UserProjects, setUserProjects] = useState<Project[]>([]);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-
+  const [curr_user, setUser] = useState<User | null>(null);
   const handleCurrentProject = (project: Project) => {
     setCurrentProject(project);
   };
@@ -33,21 +33,23 @@ export default function Dashboard() {
       },
     })
       .then((res) => res.json())
-      .then((data: Project[]) => {
-        setUserProjects(data);
-        if (data.length > 0) {
+      .then((data: { userProjects: Project[]; user: User }) => {
+        const { userProjects, user } = data;
+        setUser(user);
+        setUserProjects(userProjects);
+        if (userProjects.length > 0) {
           // If we already have a current project, find and update it
           if (currentProject) {
-            const updatedCurrentProject = data.find(
+            const updatedCurrentProject = userProjects.find(
               (p) => p.id === currentProject.id
             );
             if (updatedCurrentProject) {
               setCurrentProject(updatedCurrentProject);
             } else {
-              setCurrentProject(data[0]);
+              setCurrentProject(userProjects[0]);
             }
           } else {
-            setCurrentProject(data[0]);
+            setCurrentProject(userProjects[0]);
           }
         }
       })
@@ -151,9 +153,10 @@ export default function Dashboard() {
     fetchProjects();
   };
 
-  return currentProject ? (
+  return currentProject && curr_user ? (
     <div className='container mx-auto py-8 px-4 md:px-8'>
       <WelcomeHeader
+        current_user={curr_user}
         projectData={UserProjects}
         current={currentProject}
         onProjectChange={handleCurrentProject}

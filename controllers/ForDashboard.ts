@@ -38,7 +38,7 @@ export const getUserProjectsById = async ({ params }: { params: { id: string } }
             .filter((mem: { user: { id: string; }; }) => mem.user.id === id)
             .map((mem: { project: Project; }) => mem.project);
 
-        return NextResponse.json(userProjects);
+        return NextResponse.json({userProjects,user});
     } catch (error) {
         console.error('Error in getUserProjectsById:', error);
         return NextResponse.json({ error: 'Server error' }, { status: 500 });
