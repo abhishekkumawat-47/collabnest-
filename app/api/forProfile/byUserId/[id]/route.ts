@@ -24,6 +24,7 @@ export async function GET(
         role: true,
         department: true,
         branch: true,
+        degree: true,
         rating: true,
         picture: true,
         applications: true,
