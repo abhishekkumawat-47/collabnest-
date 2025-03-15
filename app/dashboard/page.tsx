@@ -12,6 +12,7 @@ import EditTaskTimelineModal from "@/components/modals/EditTaskTimelineModal";
 import EditLearningMaterialsModal from "@/components/modals/EditLearningMaterialsModal";
 import { Project, ProjectMember, Subtask } from "@/types/leaderboard.ts";
 import Loader from "@/components/Loader";
+import { auth } from "@/auth";
 
 export default function Dashboard() {
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
@@ -21,9 +22,38 @@ export default function Dashboard() {
   const [UserProjects, setUserProjects] = useState<Project[]>([]);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
 
+  const [userName, setUserName] = useState("");
+  const [userEmail,setUserEmail] = useState("");
+
+  console.log(userName);
+  // {
+  //   user: {
+  //     name: 'Rishi Kumar',
+  //     email: 'rishikumargautam2005@gmail.com',
+  //     image: null
+  //   },
+  //   expires: '2025-04-14T07:51:27.197Z'
+  // }
+
+  // console.log(session?.user?.name);
+
+  const fetchUserDetails = async () => {
+    try {
+      console.log("Fetching user details...");
+      const session = await auth();
+      setUserName(session?.user?.name || "");
+      setUserEmail(session?.user?.email || "");
+      console.log(session || "");
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
   const handleCurrentProject = (project: Project) => {
     setCurrentProject(project);
   };
+
+
 
   const fetchProjects = () => {
     fetch(`/api/forDashboard/byUserId/${id}`, {
@@ -56,7 +86,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchProjects();
+    // fetchUserDetails();
   }, [id]);
+
+  useEffect(() => {
+    // console.log("Fetching user details...");
+    fetchUserDetails();
+  }
+  ,[]);
 
   const project_id = useRef("");
   useEffect(() => {

@@ -1,9 +1,37 @@
-import React from 'react';
+"use client";
+import React, { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Edit, Settings } from 'lucide-react';
+import { auth } from '@/auth';
 
 export const ProfileHeader = () => {
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+  
+  const fetchUserDetails = async () => {
+    try {
+      console.log("Fetching user details...");
+      const session = await auth();
+      console.log(session);
+      
+      // Set user data directly from the fetched session
+      setUserName(session?.user?.name || "");
+      setUserEmail(session?.user?.email || "");
+    }
+    catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
+  useEffect(() => {
+    
+    
+    fetchUserDetails();
+  }, []);
+
+  fetchUserDetails();
+  
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-4">
@@ -12,9 +40,9 @@ export const ProfileHeader = () => {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-2xl font-bold">Frank Ocean</h1>
+          <h1 className="text-2xl font-bold">{userName || "Loading..."}</h1>
           <p className="text-muted-foreground text-sm">Computer Science Engineering</p>
-          <p className="text-sm text-muted-foreground">frank.ocean@college.edu</p>
+          <p className="text-sm text-muted-foreground">{userEmail || "Loading..."}</p>
         </div>
       </div>
       <div className="flex space-x-2">
