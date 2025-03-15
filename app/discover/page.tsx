@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import {
@@ -171,36 +172,67 @@ const Discovery = () => {
     }
   };
 
- // Hardcoded user ID for now
-interface ApplicationResponse {
-  message?: string;
-  error?: string;
-}
 
-async function applyForProject(projectId: string): Promise<void> {
-  try {
-    const response = await fetch("/api/applications", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
-        projectId : "0d2216bc-99e5-483b-8f92-44b6ec5a247f"
-      }),
-    });
+  const [btnLoading, setBtnLoading] = useState<{ [key: string]: boolean }>({});
+  const [applied, setApplied] = useState<{ [key: string]: boolean }>({});
 
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || data.message || "Application failed");
+  async function applyForProject(projectId: string): Promise<void> {
+    try {
+      setBtnLoading((prev) => ({ ...prev, [projectId]: true }));
+
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
+          projectId,
+          action: "apply",
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || data.message || "Application failed");
+      }
+
+      alert("Project application successful!");
+      setApplied((prev) => ({ ...prev, [projectId]: true }));
+    } catch (error) {
+      console.error("Error applying for project:", error);
+      alert("Failed to apply for project. Please try again later.");
+    } finally {
+      setBtnLoading((prev) => ({ ...prev, [projectId]: false }));
     }
-
-    const data: ApplicationResponse = await response.json();
-    console.log(data.message);
-    alert("Project application successful!");
-  } catch (error) {
-    console.error("Error applying for project:", error);
-    alert("Failed to apply for project. Please try again later.");
   }
-}
+
+  async function withdrawFromProject(projectId: string): Promise<void> {
+    try {
+      setBtnLoading((prev) => ({ ...prev, [projectId]: true }));
+
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
+          projectId,
+          action: "withdraw",
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || data.message || "Withdrawal failed");
+      }
+
+      alert("Project withdrawal successful!");
+      setApplied((prev) => ({ ...prev, [projectId]: false }));
+    } catch (error) {
+      console.error("Error withdrawing from project:", error);
+      alert("Failed to withdraw from project. Please try again later.");
+    } finally {
+      setBtnLoading((prev) => ({ ...prev, [projectId]: false }));
+    }
+  }
 
   return (
     <>
@@ -379,14 +411,22 @@ async function applyForProject(projectId: string): Promise<void> {
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
                   <Button
-                  onClick={()=>{
-                    applyForProject(project.id)
-                  }}
+                    onClick={() => {
+                      applied[project.id]
+                        ? withdrawFromProject(project.id)
+                        : applyForProject(project.id);
+                    }}
                     variant="outline"
                     className="w-auto bg-black text-white"
+                    disabled={btnLoading[project.id]} // Disable when loading
                   >
-                    Apply
+                    {btnLoading[project.id]
+                      ? "Loading..."
+                      : applied[project.id]
+                      ? "Withdraw"
+                      : "Apply"}
                   </Button>
+
                   <Button
                     variant="outline"
                     className="w-auto flex items-center"

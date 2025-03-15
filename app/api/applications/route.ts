@@ -35,21 +35,21 @@ interface ApiResponse {
 
 export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
   try {
-    const body: RequestBody = await req.json();
+    const body: RequestBody = await req.json(); // recieve data from frontend
 
     if (!body.action) {
       return NextResponse.json({ error: "Action is required" }, { status: 400 });
     }
 
     if (body.action === "apply") {
-      return await applyToProject(body.applicantId, body.projectId);
+      return await applyToProject(body.applicantId, body.projectId); // if action is apply, call applyToProject function
     }
 
     if (body.action === "withdraw") {
-      return await withdrawFromProject(body.applicantId, body.projectId);
+      return await withdrawFromProject(body.applicantId, body.projectId); // if action is withdraw, call withdrawFromProject function
     }
 
-    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 }); // if action is not apply or withdraw
   } catch (error) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
@@ -61,7 +61,7 @@ async function applyToProject(applicantId: string, projectId: string): Promise<N
     return NextResponse.json({ error: "User ID and Project ID are required" }, { status: 400 });
   }
 
-  // Check if user and project exist
+  // Check if user and project exist 
   const user = await prisma.user.findUnique({ where: { id: applicantId } });
   const project = await prisma.project.findUnique({ where: { id: projectId } });
 
@@ -70,7 +70,7 @@ async function applyToProject(applicantId: string, projectId: string): Promise<N
   }
 
   // Create a new application entry
-  await prisma.application.create({
+  await prisma.application.create({ 
     data: {
       applicantId: applicantId,
       projectId: projectId,
