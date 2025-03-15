@@ -1,60 +1,99 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye } from 'lucide-react';
- 
-const projectData = [
-  {
-    title: "Autonomous Robot Navigation",
-    description: "Developed Deep Reinforcement Learning navigation algorithms",
-    domains: ["Machine Learning", "Robotics"],
-    status: "Completed",
-    date: "Mar 2025"
-  },
-  {
-    title: "Web Development Framework",
-    description: "Created a scalable React-based web application framework",
-    domains: ["Web Development", "Frontend"],
-    status: "Completed",
-    date: "Jan 2025"
-  }
-];
- 
+import { Eye } from "lucide-react";
+
+const hardcodedUserId = "2487e9e1-b723-4cf9-84a6-cc04efae3365";
+
+interface Project {
+  id: string;
+  title: string;
+  description?: string;
+  requirementTags: string[]; // Domains
+  deadlineToComplete?: string;
+}
+
 export const CompletedProjects = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
+
+  useEffect(() => {
+    const fetchCompletedProjects = async () => {
+      try {
+        const response = await fetch(`/api/projects/completed/${hardcodedUserId}`);
+        if (!response.ok) throw new Error("Failed to fetch projects");
+
+        const data = await response.json();
+        setProjects(data);
+      } catch (err) {
+        setError("Error fetching completed projects");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCompletedProjects();
+  }, []);
+
+  if (loading) return <p>Loading completed projects...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
+  const displayedProjects = showAll ? projects : projects.slice(0, 2);
+
   return (
     <Card className="mb-6">
       <CardHeader>
         <CardTitle>Completed Projects</CardTitle>
       </CardHeader>
       <CardContent>
-        {projectData.map((project, index) => (
-          <div 
-            key={index} 
-            className="flex justify-between items-center py-4 border-b last:border-b-0 gap-3"
-          >
-            <div>
-              <div className="font-medium">{project.title}</div>
-              <div className="text-sm text-muted-foreground">
-                {project.description}
+        {projects.length === 0 ? (
+          <p className="text-muted-foreground">No completed projects found.</p>
+        ) : (
+          <>
+            {displayedProjects.map((project) => (
+              <div
+                key={project.id}
+                className="flex justify-between items-center py-4 border-b last:border-b-0 gap-3"
+              >
+                <div>
+                  <div className="font-medium">{project.title}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {project.description || "No description available"}
+                  </div>
+                  <div className="mt-2 flex space-x-2">
+                    {project.requirementTags.map((domain) => (
+                      <Badge key={domain} variant="outline">
+                        {domain}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col items-center lg:space-x-2 lg:flex-row gap-y-2">
+                  <span className="text-sm text-center text-muted-foreground">
+                    {project.deadlineToComplete
+                      ? new Date(project.deadlineToComplete).toLocaleDateString()
+                      : "N/A"}
+                  </span>
+                  <Button variant="outline" size="icon">
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="mt-2 flex space-x-2">
-                {project.domains.map((domain) => (
-                  <Badge key={domain} variant="outline">{domain}</Badge>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col items-center lg:space-x-2 lg:flex-row gap-y-2">
-              
-              <span className="text-sm text-center text-muted-foreground">{project.date}</span>
-              <Button variant="outline" size="icon">
-                <Eye className="h-4 w-4" />
+            ))}
+            {projects.length > 2 && (
+              <Button variant="link" onClick={() => setShowAll(!showAll)}>
+                {showAll ? "View Less" : "View More"}
               </Button>
-            </div>
-          </div>
-        ))}
+            )}
+          </>
+        )}
       </CardContent>
     </Card>
   );
 };
- 

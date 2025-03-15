@@ -11,12 +11,15 @@ import { LeaderboardEntry } from '@/types/leaderboard';
 import { LeaderboardUserAvatar } from '@/components/leaderboard/LeaderboardUserAvatar';
 import { LeaderboardUserDomains } from '@/components/leaderboard/LeaderboardUserDomains';
 
-
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[];
 }
 
 export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ entries }) => {
+  if (!entries || !Array.isArray(entries)) {
+    return <div>No data available</div>;
+  }
+
   return (
     <Table>
       <TableHeader>
@@ -45,7 +48,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ entries }) =
               <LeaderboardUserDomains domains={entry.activeDomains} />
             </TableCell>
             <TableCell>{entry.department}</TableCell>
-            <TableCell className="text-right">{entry.points}</TableCell>
+            <TableCell className="text-right">{entry.rating}</TableCell>
           </TableRow>
         ))}
       </TableBody>
