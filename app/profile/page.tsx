@@ -19,12 +19,12 @@ export default function ProfilePage() {
         <div className="lg:col-span-2">
           <ProfileHeader />
           <ProfileStats />
-          <ProfileBadges />
           <CompletedProjects /> 
           <RecentActivity />
         </div>
         <div>
           <UserDetails />
+          <ProfileBadges />
           <CVSection />
         </div>
       </div>

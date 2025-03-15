@@ -1,41 +1,71 @@
-import React from 'react';
+"use client"
+
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GraduationCap, Mail, MapPin, Briefcase, QrCode, University } from 'lucide-react';
 
-const detailsData = [
-    {
-        icon: QrCode,
-        label: 'Roll No',
-        value: '2301CS1234',
-    },
-    {
-        icon: University,
-        label: 'College',
-        value: 'Indian Institute of Technology, Patna',
-    },
-    {
-        icon: GraduationCap,
-        label: 'Degree',
-        value: 'B.Tech in Computer Science and Engineering',
-    },
-    {
-        icon: Briefcase,
-        label: 'Branch',
-        value: 'CSE',
-    },
-    {
-        icon: Mail,
-        label: 'Email',
-        value: 'frank.ocean@iitp.ac.in',
-    },
-    {
-        icon: MapPin,
-        label: 'Location',
-        value: 'Patna, Bihar',
-    },
-];
+const hardcodedUserId = '2487e9e1-b723-4cf9-84a6-cc04efae3365';
 
 export const UserDetails = () => {
+  const [userData, setUserData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`/api/forProfile/byUserId/${hardcodedUserId}`);
+        if (!response.ok) throw new Error('Failed to fetch user data');
+
+        const data = await response.json();
+        setUserData(data);
+      } catch (err) {
+        setError('Error fetching user details');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  if (loading) return <p>Loading user details...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
+  const detailsData = [
+    {
+      icon: MapPin,
+      label: 'Name',
+      value: userData?.name || 'N/A', 
+    },
+    {
+      icon: QrCode,
+      label: 'Roll No',
+      value: userData?.roll || 'N/A',
+    },
+    {
+      icon: GraduationCap,
+      label: 'Degree',
+      value: userData?.degree || 'N/A',
+    },
+    {
+      icon: Briefcase,
+      label: 'Department',
+      value: userData?.department || 'N/A',
+    },
+    {
+      icon: Mail,
+      label: 'Email',
+      value: userData?.email || 'N/A',
+    },
+    {
+      icon: University,
+      label: 'College',
+      value: 'Indian Institute of Technology, Patna',
+    },
+    
+  ];
 
   return (
     <Card className="mb-6">
@@ -49,7 +79,9 @@ export const UserDetails = () => {
               <detail.icon className="h-5 w-5 min-w-5 text-muted-foreground" />
               <div>
                 <div className="text-sm text-muted-foreground">{detail.label}</div>
-                <div className={detail.label=="Email"?"font-medium break-all":"font-medium"}>{detail.value}</div>
+                <div className={detail.label === 'Email' ? 'font-medium break-all' : 'font-medium'}>
+                  {detail.value}
+                </div>
               </div>
             </div>
           ))}
@@ -58,4 +90,3 @@ export const UserDetails = () => {
     </Card>
   );
 };
-
