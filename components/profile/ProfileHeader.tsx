@@ -1,40 +1,13 @@
-"use client";
-import React, { useState, useEffect } from 'react';
+"use client"
 
+import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Edit, Settings } from 'lucide-react';
-import { auth } from '@/auth';
 
 const hardcodedUserId = '2487e9e1-b723-4cf9-84a6-cc04efae3365';
 
 export const ProfileHeader = () => {
-  const [userName, setUserName] = useState("");
-  const [userEmail, setUserEmail] = useState("");
-  
-  const fetchUserDetails = async () => {
-    try {
-      console.log("Fetching user details...");
-      const session = await auth();
-      console.log(session);
-      
-      // Set user data directly from the fetched session
-      setUserName(session?.user?.name || "");
-      setUserEmail(session?.user?.email || "");
-    }
-    catch (error) {
-      console.error("Error fetching user details:", error);
-    }
-  };
-
-  useEffect(() => {
-    
-    
-    fetchUserDetails();
-  }, []);
-
-  fetchUserDetails();
-  
 
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -74,9 +47,6 @@ export const ProfileHeader = () => {
           <AvatarFallback className="text-2xl">{userData?.name ? getInitials(userData.name) : 'CN'}</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-2xl font-bold">{userName || "Loading..."}</h1>
-          <p className="text-muted-foreground text-sm">Computer Science Engineering</p>
-          <p className="text-sm text-muted-foreground">{userEmail || "Loading..."}</p>
           <h1 className="text-2xl font-bold">{userData?.name}</h1>
           <p className="text-muted-foreground text-sm">{userData?.department}</p>
           <p className="text-sm text-muted-foreground">{userData?.email}</p>
