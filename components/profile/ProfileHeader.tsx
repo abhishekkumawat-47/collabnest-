@@ -1,20 +1,55 @@
-import React from 'react';
+"use client"
+
+import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Edit, Settings } from 'lucide-react';
 
+const hardcodedUserId = '2487e9e1-b723-4cf9-84a6-cc04efae3365';
+
 export const ProfileHeader = () => {
+
+  const [userData, setUserData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`/api/forProfile/byUserId/${hardcodedUserId}`);
+        if (!response.ok) throw new Error('Failed to fetch user data');
+
+        const data = await response.json();
+        setUserData(data);
+      } catch (err) {
+        setError('Error fetching user details');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  if (loading) return <p>Loading user details...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map((n) => n[0]).join('');
+  };
+
   return (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center space-x-4">
         <Avatar className="h-20 w-20">
-          <AvatarImage src="/profile-placeholder.png" />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src={userData?.picture}/>
+          <AvatarFallback className="text-2xl">{userData?.name ? getInitials(userData.name) : 'CN'}</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-2xl font-bold">Frank Ocean</h1>
-          <p className="text-muted-foreground text-sm">Computer Science Engineering</p>
-          <p className="text-sm text-muted-foreground">frank.ocean@college.edu</p>
+          <h1 className="text-2xl font-bold">{userData?.name}</h1>
+          <p className="text-muted-foreground text-sm">{userData?.department}</p>
+          <p className="text-sm text-muted-foreground">{userData?.email}</p>
         </div>
       </div>
       <div className="flex space-x-2">
