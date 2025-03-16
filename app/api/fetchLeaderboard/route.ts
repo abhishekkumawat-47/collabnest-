@@ -19,8 +19,7 @@ export async function GET(req: NextRequest) {
         picture: true,
       },
     });
-    console.log('Fetched top users:', topUsers);
-
+    
     return NextResponse.json(topUsers, { status: 200 });
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
