@@ -2,7 +2,7 @@ export interface LeaderboardEntry {
     id: string;
     name: string;
     department: string;
-    points: number;
+    rating: number;
     activeDomains: string[];
   }
   export type Status = "OPEN" | "IN PROGRESS" | "CLOSED";

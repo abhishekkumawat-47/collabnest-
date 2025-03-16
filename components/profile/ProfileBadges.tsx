@@ -49,8 +49,6 @@ export const ProfileBadges = () => {
     fetchUserData();
   }, []);
 
-  if (loading) return <p>Loading user details...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
 
   const displayedBadges = showAll ? badgeData : badgeData.slice(0, 4);
 

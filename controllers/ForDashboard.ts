@@ -35,10 +35,10 @@ export const getUserProjectsById = async ({ params }: { params: { id: string } }
 
         // Filter user's projects where they are a participant
         const userProjects = user.projectsParticipated
-            .filter((mem: { user: { id: string; }; }) => mem.user.id === id)
-            .map((mem: { project: Project; }) => mem.project);
+            .filter((mem) => mem.user.id === id)
+            .map((mem) => mem.project);
 
-        return NextResponse.json({userProjects,user});
+        return NextResponse.json(userProjects);
     } catch (error) {
         console.error('Error in getUserProjectsById:', error);
         return NextResponse.json({ error: 'Server error' }, { status: 500 });

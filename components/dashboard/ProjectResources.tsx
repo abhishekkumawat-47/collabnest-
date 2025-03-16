@@ -16,13 +16,16 @@ export function ProjectResources({ resources }: { resources: JSON[] }) {
           <CardTitle className='text-lg font-medium'>
             Project Resources
           </CardTitle>
-          <Button
-            variant='ghost'
-            size='sm'
-            className='text-sm'
-            onClick={() => setShowAll(!showAll)}>
-            {showAll ? "Show Less" : "View All"}
-          </Button>
+          {/* Only show the button if there are more than 3 resources */}
+          {resources.length > 3 && (
+            <Button
+              variant='ghost'
+              size='sm'
+              className='text-sm'
+              onClick={() => setShowAll(!showAll)}>
+              {showAll ? "Show Less" : "View All"}
+            </Button>
+          )}
         </div>
         <p className='text-sm text-gray-500'>
           Uploaded by your mentor and professors

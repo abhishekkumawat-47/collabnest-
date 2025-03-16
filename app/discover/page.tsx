@@ -56,7 +56,7 @@ const Discovery = () => {
   useEffect(() => {
     setLoading(true); // Start loading
 
-    fetch("/api/projects")
+    fetch("/api/projects/All_Project")
       .then((res) => res.json())
       .then((data) => {
         setAllProjects(data); // Keep all projects
@@ -171,49 +171,49 @@ const Discovery = () => {
     }
   };
 
- // Hardcoded user ID for now
-interface ApplicationResponse {
-  message?: string;
-  error?: string;
-}
-
-async function applyForProject(projectId: string): Promise<void> {
-  try {
-    const response = await fetch("/api/applications", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
-        projectId : "0d2216bc-99e5-483b-8f92-44b6ec5a247f"
-      }),
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || data.message || "Application failed");
-    }
-
-    const data: ApplicationResponse = await response.json();
-    console.log(data.message);
-    alert("Project application successful!");
-  } catch (error) {
-    console.error("Error applying for project:", error);
-    alert("Failed to apply for project. Please try again later.");
+  // Hardcoded user ID for now
+  interface ApplicationResponse {
+    message?: string;
+    error?: string;
   }
-}
+
+  async function applyForProject(projectId: string): Promise<void> {
+    try {
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
+          projectId: "0d2216bc-99e5-483b-8f92-44b6ec5a247f",
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || data.message || "Application failed");
+      }
+
+      const data: ApplicationResponse = await response.json();
+      console.log(data.message);
+      alert("Project application successful!");
+    } catch (error) {
+      console.error("Error applying for project:", error);
+      alert("Failed to apply for project. Please try again later.");
+    }
+  }
 
   return (
     <>
-      <div className="mx-5">
-        <h1 className="text-3xl mt-5 mb-1 font-bold">
+      <div className='mx-5'>
+        <h1 className='text-3xl mt-5 mb-1 font-bold'>
           Discover Recommended Projects
         </h1>
-        <p className="text-muted-foreground">
+        <p className='text-muted-foreground'>
           Browse projects from professors and research groups across various
           domains.
         </p>
         <Input
-          type="text"
+          type='text'
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => {
@@ -225,21 +225,20 @@ async function applyForProject(projectId: string): Promise<void> {
               setSelectedDomain(null);
             }
           }}
-          placeholder="Search projects by clicking Enter"
-          className="w-[100%] md:w-100 my-4"
+          placeholder='Search projects by clicking Enter'
+          className='w-[100%] md:w-100 my-4'
         />
-        <div className="flex flex-row flex-wrap justify-start space-x-4 space-y-3">
+        <div className='flex flex-row flex-wrap justify-start space-x-4 space-y-3'>
           <Select
             value={selectedDomain || ""}
-            onValueChange={setSelectedDomain}
-          >
-            <SelectTrigger className="">
-              <SelectValue placeholder="Domain" />
+            onValueChange={setSelectedDomain}>
+            <SelectTrigger className=''>
+              <SelectValue placeholder='Domain' />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Domain</SelectLabel>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value='all'>All</SelectItem>
                 {Array.from(
                   new Set(
                     allProjects.flatMap((project) => project.requirementTags)
@@ -255,16 +254,15 @@ async function applyForProject(projectId: string): Promise<void> {
 
           <Select
             value={selectedDifficulty || ""}
-            onValueChange={setSelectedDifficulty}
-          >
-            <SelectTrigger className="">
+            onValueChange={setSelectedDifficulty}>
+            <SelectTrigger className=''>
               {/* removed fixed width to make it responsive */}
-              <SelectValue placeholder="Difficulty" />
+              <SelectValue placeholder='Difficulty' />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Difficulty</SelectLabel>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value='all'>All</SelectItem>
                 {Array.from(
                   new Set(allProjects.map((project) => project.difficultyTag))
                 ) // Remove duplicates
@@ -279,15 +277,14 @@ async function applyForProject(projectId: string): Promise<void> {
 
           <Select
             value={selectedDuration || ""}
-            onValueChange={setSelectedDuration}
-          >
-            <SelectTrigger className="">
-              <SelectValue placeholder="Duration" />
+            onValueChange={setSelectedDuration}>
+            <SelectTrigger className=''>
+              <SelectValue placeholder='Duration' />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Duration</SelectLabel>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value='all'>All</SelectItem>
                 {uniqueDurations.map((duration, index) => (
                   <SelectItem key={index} value={String(duration)}>
                     {duration} {duration === 1 ? "month" : "months"}
@@ -299,15 +296,14 @@ async function applyForProject(projectId: string): Promise<void> {
 
           <Select
             value={selectedDeadline || ""}
-            onValueChange={setSelectedDeadline}
-          >
-            <SelectTrigger className="sm:w-[180px]">
-              <SelectValue placeholder="Application Deadline" />
+            onValueChange={setSelectedDeadline}>
+            <SelectTrigger className='sm:w-[180px]'>
+              <SelectValue placeholder='Application Deadline' />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Application Deadline</SelectLabel>
-                <SelectItem value="all">All</SelectItem>
+                <SelectItem value='all'>All</SelectItem>
                 {uniqueDeadlines.map((deadline, index) => (
                   <SelectItem key={index} value={deadline}>
                     {new Date(deadline).toLocaleDateString("en-US", {
@@ -321,43 +317,42 @@ async function applyForProject(projectId: string): Promise<void> {
             </SelectContent>
           </Select>
 
-          <div className="flex flex-row flex-wrap gap-4">
+          <div className='flex flex-row flex-wrap gap-4'>
             <Button onClick={Searchonclick}>Search</Button>
             <Button onClick={resetFilters}>Reset Filters</Button>
           </div>
         </div>
-        <Separator className="my-5" />
+        <Separator className='my-5' />
         {loading ? (
           <Loader />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-4 mx-auto">
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-4 mx-auto'>
             {projects.map((project) => (
               <Card key={project.id}>
                 <CardHeader>
-                  <CardTitle className="text-2xl">{project.title}</CardTitle>
+                  <CardTitle className='text-2xl'>{project.title}</CardTitle>
                   <CardDescription>{project.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex flex-wrap mb-4">
+                  <div className='flex flex-wrap mb-4'>
                     {project.requirementTags.map((tag, index) => (
                       <span
                         key={index}
-                        className="bg-black text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded mb-2"
-                      >
+                        className='bg-black text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded mb-2'>
                         {tag}
                       </span>
                     ))}
                   </div>
 
-                  <div className="text-gray-600 text-sm space-y-2">
-                    <p className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      <span className="font-semibold">Apply by:</span>{" "}
+                  <div className='text-gray-600 text-sm space-y-2'>
+                    <p className='flex items-center'>
+                      <Calendar className='h-4 w-4 mr-2' />
+                      <span className='font-semibold'>Apply by:</span>{" "}
                       {formatDate(project.deadlineToApply)}
                     </p>
 
                     <p>
-                      <span className="font-semibold">Duration:</span>{" "}
+                      <span className='font-semibold'>Duration:</span>{" "}
                       {(() => {
                         const deadlineToComplete = new Date(
                           project.deadlineToComplete
@@ -377,21 +372,19 @@ async function applyForProject(projectId: string): Promise<void> {
                     </p>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end space-x-2">
+                <CardFooter className='flex justify-end space-x-2'>
                   <Button
-                  onClick={()=>{
-                    applyForProject(project.id)
-                  }}
-                    variant="outline"
-                    className="w-auto bg-black text-white"
-                  >
+                    onClick={() => {
+                      applyForProject(project.id);
+                    }}
+                    variant='outline'
+                    className='w-auto bg-black text-white'>
                     Apply
                   </Button>
                   <Button
-                    variant="outline"
-                    className="w-auto flex items-center"
-                  >
-                    <FaStar className="mr-0.5" /> Star
+                    variant='outline'
+                    className='w-auto flex items-center'>
+                    <FaStar className='mr-0.5' /> Star
                   </Button>
                 </CardFooter>
               </Card>

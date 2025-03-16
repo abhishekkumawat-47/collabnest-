@@ -17,7 +17,7 @@ export default function Dashboard() {
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
   const [isTaskModalOpen, setTaskModalOpen] = useState(false);
   const [isResourcesModalOpen, setResourcesModalOpen] = useState(false);
-  const id = "1c1d2c2d-7d46-4cbf-8d4a-93e9e97e5600"; //user id
+  const id = "2487e9e1-b723-4cf9-84a6-cc04efae3365"; //user id
   const [UserProjects, setUserProjects] = useState<Project[]>([]);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [curr_user, setUser] = useState<User | null>(null);
@@ -33,31 +33,38 @@ export default function Dashboard() {
       },
     })
       .then((res) => res.json())
-      .then((data: { userProjects: Project[]; user: User }) => {
-        const { userProjects, user } = data;
-        setUser(user);
-        setUserProjects(userProjects);
-        if (userProjects.length > 0) {
-          // If we already have a current project, find and update it
+      .then((data: Project[]) => {
+        setUserProjects(data);
+        if (data.length > 0) {
           if (currentProject) {
-            const updatedCurrentProject = userProjects.find(
+            const updatedCurrentProject = data.find(
               (p) => p.id === currentProject.id
             );
-            if (updatedCurrentProject) {
-              setCurrentProject(updatedCurrentProject);
-            } else {
-              setCurrentProject(userProjects[0]);
-            }
+            setCurrentProject(updatedCurrentProject || data[0]);
           } else {
-            setCurrentProject(userProjects[0]);
+            setCurrentProject(data[0]);
           }
         }
+      })
+      .catch((err) => console.log(err));
+  };
+  const fetchUser = () => {
+    fetch(`/api/forDashboard/userDetails/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data: User) => {
+        setUser(data);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
     fetchProjects();
+    fetchUser();
   }, [id]);
 
   const project_id = useRef("");

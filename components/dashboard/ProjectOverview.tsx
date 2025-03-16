@@ -20,17 +20,17 @@ export function ProjectOverview({ current }: { current: Project }) {
           <CardTitle className='text-xl font-bold'>{current.title}</CardTitle>
           <div className='flex items-center flex-wrap gap-2 mt-2'>
             {current.requirementTags.length > 3
-              ? current.requirementTags.slice(0, 3).map((tags) => (
+              ? current.requirementTags.slice(0, 3).map((tags, index) => (
                   <Badge
-                    key={tags}
+                    key={index}
                     variant='secondary'
                     className='bg-gray-800 text-white hover:bg-gray-700'>
                     {tags}
                   </Badge>
                 ))
-              : current.requirementTags.map((tags) => (
+              : current.requirementTags.map((tags, index) => (
                   <Badge
-                    key={tags}
+                    key={index}
                     variant='secondary'
                     className='bg-gray-800 text-white hover:bg-gray-700'>
                     {tags}

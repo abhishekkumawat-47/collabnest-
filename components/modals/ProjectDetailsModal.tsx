@@ -49,7 +49,7 @@ const ProjectDetailsModal = ({
 
   // Data for pie chart
   const taskDistributionData = [
-    { name: "Completed", value: completedTasks, color: "#16a34a" }, // green-600
+    { name: "Done", value: completedTasks, color: "#16a34a" }, // green-600
     { name: "Ongoing", value: inProgressTasks, color: "#ea580c" }, // orange-600
     { name: "Upcoming", value: upcomingTasks, color: "#64748b" }, // slate-500
   ].filter((item) => item.value > 0); // Only show categories with tasks
@@ -165,7 +165,7 @@ const ProjectDetailsModal = ({
                       <RechartsPieChart>
                         <Pie
                           data={taskDistributionData}
-                          cx='50%'
+                          cx='55%'
                           cy='50%'
                           innerRadius={60}
                           outerRadius={80}
@@ -217,11 +217,11 @@ const ProjectDetailsModal = ({
               </div>
 
               {proj.subtasks && proj.subtasks.length > 0 ? (
-                <div className='space-y-3'>
+                <div className='space-y-2'>
                   {proj.subtasks.map((task, index) => (
                     <div
                       key={index}
-                      className='bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500'>
+                      className='bg-gray-50 rounded-lg border-l-4 border-blue-500'>
                       <div className='flex justify-between'>
                         <span className='font-medium'>{task.title}</span>
                         <Badge

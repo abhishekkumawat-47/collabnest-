@@ -6,7 +6,7 @@ interface LeaderboardUserDomainsProps {
 }
 
 export const LeaderboardUserDomains: React.FC<LeaderboardUserDomainsProps> = ({ 
-  domains 
+  domains = []
 }) => {
   return (
     <div className="flex space-x-2">

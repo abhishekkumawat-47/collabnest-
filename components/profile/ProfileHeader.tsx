@@ -48,6 +48,7 @@ export const ProfileHeader = () => {
         </Avatar>
         <div>
           <h1 className="text-2xl font-bold">{userData?.name}</h1>
+          <p className="text-muted-foreground text-sm">{userData?.role}</p>
           <p className="text-muted-foreground text-sm">{userData?.department}</p>
           <p className="text-sm text-muted-foreground">{userData?.email}</p>
         </div>
