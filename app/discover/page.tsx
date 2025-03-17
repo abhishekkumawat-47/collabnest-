@@ -1,7 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import React from "react";
-
+import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -22,7 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { FaStar } from "react-icons/fa";
 import { Calendar } from "lucide-react";
 import Loader from "@/components/Loader";
@@ -46,11 +44,11 @@ const Discovery = () => {
     projectResources: any[]; // JSON array
     createdAt: string; // ISO date string
     updatedAt: string;
+    subtasks: string[];
   }
 
   const [allProjects, setAllProjects] = useState<Project[]>([]); // Stores all fetched projects
   const [projects, setProjects] = useState<Project[]>([]); // Stores filtered projects
-
   const [loading, setLoading] = useState<boolean>(true); // Loader state
 
   useEffect(() => {
@@ -66,9 +64,7 @@ const Discovery = () => {
       .finally(() => setLoading(false)); // Stop loading
   }, []);
 
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(
-    null
-  );
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const [selectedDeadline, setSelectedDeadline] = useState<string | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
@@ -80,9 +76,7 @@ const Discovery = () => {
       allProjects.map((project) => {
         const deadlineToComplete = new Date(project.deadlineToComplete);
         const deadlineToApply = new Date(project.deadlineToApply);
-        const diffTime = Math.abs(
-          deadlineToComplete.getTime() - deadlineToApply.getTime()
-        );
+        const diffTime = Math.abs(deadlineToComplete.getTime() - deadlineToApply.getTime());
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30)); // Convert to months
       })
     )
@@ -140,6 +134,7 @@ const Discovery = () => {
 
     setProjects(result); // Update displayed projects without losing original data
   };
+
   const resetFilters = () => {
     // Reset the projects to show all projects
     setProjects(allProjects);
@@ -152,6 +147,7 @@ const Discovery = () => {
     setSearchQuery("");
     // Also reset the search query
   };
+
   const filterProjectsBySearch = () => {
     if (searchQuery.trim() === "") {
       setProjects(allProjects); // Reset to all projects if search query is empty
@@ -171,36 +167,19 @@ const Discovery = () => {
     }
   };
 
- // Hardcoded user ID for now
-interface ApplicationResponse {
-  message?: string;
-  error?: string;
-}
+  const router = useRouter();
 
-async function applyForProject(projectId: string): Promise<void> {
-  try {
-    const response = await fetch("/api/applications", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
-        projectId : "0d2216bc-99e5-483b-8f92-44b6ec5a247f"
-      }),
-    });
+  const handleApplyClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, projectId: string) => {
+    event.stopPropagation();
+    // Handle apply logic here
+    console.log(`Applying for project ${projectId}`);
+  };
 
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || data.message || "Application failed");
-    }
-
-    const data: ApplicationResponse = await response.json();
-    console.log(data.message);
-    alert("Project application successful!");
-  } catch (error) {
-    console.error("Error applying for project:", error);
-    alert("Failed to apply for project. Please try again later.");
-  }
-}
+  const handleStarClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, projectId: string) => {
+    event.stopPropagation();
+    // Handle star logic here
+    console.log(`Starring project ${projectId}`);
+  };
 
   return (
     <>
@@ -332,7 +311,7 @@ async function applyForProject(projectId: string): Promise<void> {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-4 mx-auto">
             {projects.map((project) => (
-              <Card key={project.id}>
+              <Card key={project.id} onClick={() => router.push(`/projects/${project.id}`)} className="cursor-pointer">
                 <CardHeader>
                   <CardTitle className="text-2xl">{project.title}</CardTitle>
                   <CardDescription>{project.description}</CardDescription>
@@ -379,17 +358,16 @@ async function applyForProject(projectId: string): Promise<void> {
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
                   <Button
-                  onClick={()=>{
-                    applyForProject(project.id)
-                  }}
                     variant="outline"
                     className="w-auto bg-black text-white"
+                    onClick={(event) => handleApplyClick(event, project.id)}
                   >
                     Apply
                   </Button>
                   <Button
                     variant="outline"
                     className="w-auto flex items-center"
+                    onClick={(event) => handleStarClick(event, project.id)}
                   >
                     <FaStar className="mr-0.5" /> Star
                   </Button>
@@ -397,7 +375,7 @@ async function applyForProject(projectId: string): Promise<void> {
               </Card>
             ))}
           </div>
-        )}{" "}
+        )}
       </div>
     </>
   );
