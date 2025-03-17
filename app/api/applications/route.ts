@@ -70,6 +70,17 @@ async function applyToProject(applicantId: string, projectId: string): Promise<N
     return NextResponse.json({ error: "User or Project not found" }, { status: 404 });
   }
 
+  // Check if the user has already applied for the project
+  const existingApplication = await prisma.application.findFirst({
+    where: {
+      applicantId: applicantId,
+      projectId: projectId,
+    },
+  });
+  if (existingApplication) {
+    return NextResponse.json({ error: "User has already applied for this project" }, { status: 409 });
+  }
+
   // Create a new application entry
   await prisma.application.create({
     data: {
