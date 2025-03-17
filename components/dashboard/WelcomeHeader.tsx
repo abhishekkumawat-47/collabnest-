@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ProjectMember, Project } from "@/types/leaderboard";
+import { ProjectMember, Project, User } from "@/types/leaderboard.ts";
 import { ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
@@ -12,10 +12,12 @@ import {
 import { Button } from "@/components/ui/button";
 
 export function WelcomeHeader({
+  current_user,
   current,
   projectData,
   onProjectChange,
 }: {
+  current_user: User;
   current: Project;
   projectData: Project[];
   onProjectChange: (project: Project) => void;
@@ -31,7 +33,7 @@ export function WelcomeHeader({
       <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
         <div>
           <h1 className='text-2xl sm:text-3xl font-bold'>
-            Welcome back, Frank!
+            Welcome back, {current_user.name}!
           </h1>
           <p className='text-gray-600 mt-2'>
             You're making great progress on your projects. Keep up the good

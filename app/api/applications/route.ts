@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
+import type { NextRequest } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -104,4 +105,94 @@ async function withdrawFromProject(applicantId: string, projectId: string): Prom
   return NextResponse.json({ message: "Withdrawn from project successfully!" }, { status: 200 });
 }
 
+// working 
+export async function PUT(request: NextRequest) {
+  const { action, projectId, applicationId } = await request.json();
 
+
+  console.log('Starting application processing:', {
+    action,
+    projectId,
+    applicationId
+  });
+  // Input validation
+  if (!['accept', 'reject'].includes(action)) {
+    return NextResponse.json(
+      { 
+        error: 'Invalid action. Must be either "accept" or "reject"' 
+      },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      console.log("Fetching application with ID:", applicationId);
+      
+      const application = await tx.application.findUnique({
+        where: { id: applicationId },
+        include: { project: true, applicant: true }
+      });
+    
+      if (!application) {
+        console.log("Application not found!");
+        throw new Error("Application not found");
+      }
+    
+      console.log("Current application status:", application.status);
+    
+      if (application.status !== 'PENDING') {
+        console.log("Application is not pending. Current status:", application.status);
+        throw new Error("Application is not in pending state");
+      }
+    
+      console.log("Updating application status to:", action === 'accept' ? 'ACCEPTED' : 'REJECTED');
+    
+      await tx.application.update({
+        where: { id: applicationId },
+        data: { 
+          status: action === 'accept' ? 'ACCEPTED' : 'REJECTED',
+        }
+      });
+    
+      console.log("Application status updated successfully!");
+    
+      if (action === 'accept') {
+        console.log("Adding user to project members...");
+
+        await tx.project.update({
+          where: { id: projectId },
+          data: {
+            applicantCapacity: { decrement: 1 }, // Decrease applicantCapacity for both accept & reject
+            ...(action === 'accept' && { selectionCapacity: { decrement: 1 } }) // Decrease selectionCapacity only for accept
+          }
+        });
+        
+        await tx.projectMember.create({
+          data: {
+            projectId,
+            userId: application.applicantId
+          }
+        });
+    
+        console.log("User added to project members.");
+      }
+    
+      return {success : true}
+      
+    });
+    
+
+    if (result) {
+      return NextResponse.json({ error: result });
+    }
+  } catch (error) {
+    console.error('Error processing application:', error);
+    return NextResponse.json(
+      { 
+        error: 'Internal server error occurred while processing application' 
+      },
+      { status: 500 }
+    );
+  }
+}

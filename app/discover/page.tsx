@@ -54,7 +54,7 @@ const Discovery = () => {
   useEffect(() => {
     setLoading(true); // Start loading
 
-    fetch("/api/projects")
+    fetch("/api/projects/All_Project")
       .then((res) => res.json())
       .then((data) => {
         setAllProjects(data); // Keep all projects
@@ -167,12 +167,42 @@ const Discovery = () => {
     }
   };
 
+  // Hardcoded user ID for now
+  interface ApplicationResponse {
+    message?: string;
+    error?: string;
+  }
+
+  async function applyForProject(projectId: string): Promise<void> {
+    try {
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
+          projectId: projectId,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || data.message || "Application failed");
+      }
+
+      const data: ApplicationResponse = await response.json();
+      console.log(data.message);
+      alert("Project application successful!");
+    } catch (error) {
+      console.error("Error applying for project:", error);
+      alert("Failed to apply for project. Please try again later.");
+    }
+  }
+
   const router = useRouter();
 
   const handleApplyClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, projectId: string) => {
     event.stopPropagation();
-    // Handle apply logic here
-    console.log(`Applying for project ${projectId}`);
+    applyForProject(projectId);
   };
 
   const handleStarClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, projectId: string) => {
