@@ -76,7 +76,12 @@ async function seedProfessors() {
     }
 }
 
-const admins = [{ name: 'Alok Sharma' }, { name: 'Divya Patel' }, { name: 'Ravi Kumar' }, { name: 'Sneha Nair' }];
+const admins = [
+    { name: 'Alok Sharma' },
+    { name: 'Divya Patel' },
+    { name: 'Ravi Kumar' },
+    { name: 'Sneha Nair' },
+];
 
 async function seedAdmins() {
     for (const admin of admins) {
@@ -132,10 +137,9 @@ async function generateProjects() {
                 subheading: `Subheading for Project ${i}`,
                 description: `This is a sample description for Project ${i}.`,
                 difficultyTag: difficulties[Math.floor(Math.random() * difficulties.length)],
-                // requirementTags: tags,
                 requirementTags: [
-                    tags[Math.floor(Math.random() * tags.length)].toString(),
-                    tags[Math.floor(Math.random() * tags.length)].toString(),
+                    tags[Math.floor(Math.random() * tags.length)],
+                    tags[Math.floor(Math.random() * tags.length)],
                 ],
                 projectResources: [
                     {
@@ -158,6 +162,7 @@ async function generateProjects() {
         });
     }
 }
+
 async function generateProjectMembers() {
     const users = await prisma.user.findMany({
         where: { role: 'USER' },
@@ -229,7 +234,7 @@ async function generateApplications() {
 
     for (const user of users) {
         // Each user applies to 0-2 random projects
-        const numApplications = Math.floor(Math.random() * 2) + 0;
+        const numApplications = Math.floor(Math.random() * 2); // 0 to 1 application
         const shuffledProjects = projects.sort(() => 0.5 - Math.random()).slice(0, numApplications);
 
         for (const project of shuffledProjects) {
@@ -241,10 +246,45 @@ async function generateApplications() {
                     },
                 });
             } catch (e) {
-                // Handle duplicates or foreign key constraints gracefully
-                // console.warn(`Skipping duplicate/failed application for project ${project.id} by user ${user.id}`);
                 console.log(e);
             }
+        }
+    }
+}
+
+async function generateMessages() {
+    const projects = await prisma.project.findMany();
+    if (projects.length === 0) {
+        console.log('No projects found. Skipping message generation.');
+        return;
+    }
+    const students = await prisma.user.findMany({
+        where: { role: 'USER' },
+    });
+    for (const project of projects) {
+        // Create a welcome message from the project author
+        const author = await prisma.user.findUnique({
+            where: { id: project.authorId },
+        });
+        if (author) {
+            await prisma.message.create({
+                data: {
+                    senderId: author.id,
+                    projectId: project.id,
+                    content: `Welcome to ${project.title}! Looking forward to a great collaboration.`,
+                },
+            });
+        }
+        // Create a reply message from a random student (if available)
+        if (students.length > 0) {
+            const randomStudent = students[Math.floor(Math.random() * students.length)];
+            await prisma.message.create({
+                data: {
+                    senderId: randomStudent.id,
+                    projectId: project.id,
+                    content: `Excited to join ${project.title}!`,
+                },
+            });
         }
     }
 }
@@ -306,6 +346,11 @@ async function main() {
     await generateProjectMembers()
         .then(() => console.log('Project members seeded successfully!'))
         .catch((e) => console.error(e));
+
+    await generateMessages()
+        .then(() => console.log('Messages seeded successfully!'))
+        .catch((e) => console.error(e));
+
     // await goThrough()
     //     .then(() => console.log('Applications goThrough seeded successfully!'))
     //     .catch((e) => console.error(e));
