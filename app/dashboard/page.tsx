@@ -11,6 +11,7 @@ import EditProjectManagementModal from "@/components/modals/EditProjectManagemen
 import EditTeamModal from "@/components/modals/EditTeamModal";
 import EditTaskTimelineModal from "@/components/modals/EditTaskTimelineModal";
 import EditLearningMaterialsModal from "@/components/modals/EditLearningMaterialsModal";
+import CreateProjectModal from "@/components/modals/CreateProjectModal";
 import { Project, Subtask, User, Role } from "@/types/leaderboard.ts";
 import Loader from "@/components/Loader";
 
@@ -19,13 +20,14 @@ export default function Dashboard() {
   const [isTeamModalOpen, setTeamModalOpen] = useState(false);
   const [isTaskModalOpen, setTaskModalOpen] = useState(false);
   const [isResourcesModalOpen, setResourcesModalOpen] = useState(false);
+  const [isCreateProjectModalOpen, setCreateProjectModalOpen] = useState(false);
   const id = "addd061b-6883-4bab-a355-4479bf659623"; // User ID (should come from auth system)
   const [UserProjects, setUserProjects] = useState<Project[]>([]);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [curr_user, setUser] = useState<User | null>(null);
   const project_id = useRef("");
-  // const isAuth = false; // Authentication status (should come from auth system)
-  const isAuth = curr_user?.role !== "USER";
+  const isAuth = curr_user?.role !== "USER"; // Authentication status (should come from auth system)
+
   const handleCurrentProject = (project: Project) => {
     setCurrentProject(project);
   };
@@ -68,6 +70,7 @@ export default function Dashboard() {
       console.error("Error fetching projects:", error);
     }
   };
+
   const fetchUser = () => {
     fetch(`/api/forDashboard/userDetails/${id}`, {
       method: "GET",
@@ -148,6 +151,51 @@ export default function Dashboard() {
     }
   };
 
+  const onCreateProject = async (projectData: {
+    id: string;
+    title: string;
+    description: string;
+    tags: string[];
+    difficulty: string;
+    deadline: string;
+    applicantCapacity: number;
+
+    authorId: string;
+    authorName: string;
+    members: string[];
+    updates: {
+      timestamp: string;
+      message: string;
+      updatedBy: string;
+    }[];
+  }) => {
+    try {
+      const response = await fetch(`/api/forDashboard/createProject/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(projectData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to create project: ${response.statusText}`);
+      }
+
+      const newProject = await response.json();
+
+      // Add the new project to the list and set it as current
+      setUserProjects((prevProjects) => [...prevProjects, newProject]);
+      setCurrentProject(newProject);
+      setCreateProjectModalOpen(false);
+
+      // Refresh the projects list to ensure everything is up to date
+      fetchProjects();
+    } catch (error) {
+      console.error("Error creating project:", error);
+    }
+  };
+
   const onSaveTask = (updatedTasks: Subtask[]) => {
     if (currentProject) {
       const updatedProject = {
@@ -168,7 +216,7 @@ export default function Dashboard() {
     fetchProjects();
   };
 
-  return currentProject ? (
+  return (
     <div className='container mx-auto py-8 px-4 md:px-8'>
       <WelcomeHeader
         user={curr_user}
@@ -177,8 +225,28 @@ export default function Dashboard() {
         onProjectChange={handleCurrentProject}
       />
 
+      {/* Create Project Button - Only visible for authenticated authors */}
+      {isAuth && (
+        <div className='flex justify-end mb-6'>
+          <Button
+            onClick={() => setCreateProjectModalOpen(true)}
+            className='bg-blue-600 hover:bg-blue-700 text-white'>
+            Create New Project
+          </Button>
+        </div>
+      )}
+
       {/* Modals */}
       <>
+        <CreateProjectModal
+          isOpen={isCreateProjectModalOpen}
+          onClose={() => setCreateProjectModalOpen(false)}
+          onCreate={onCreateProject}
+          currentUser={{
+            id: id,
+            name: curr_user?.name || "Author",
+          }}
+        />
         <EditProjectManagementModal
           isOpen={isProjectModalOpen}
           onClose={() => setProjectModalOpen(false)}
@@ -194,64 +262,86 @@ export default function Dashboard() {
         <EditTaskTimelineModal
           isOpen={isTaskModalOpen}
           onClose={() => setTaskModalOpen(false)}
-          tasks={currentProject.subtasks}
-          projectId={currentProject.id}
+          tasks={currentProject?.subtasks || []}
+          projectId={currentProject?.id || ""}
           onSave={onSaveTask}
         />
         <EditLearningMaterialsModal
           id={project_id.current}
           isOpen={isResourcesModalOpen}
           onClose={() => setResourcesModalOpen(false)}
-          materials={currentProject.projectResources}
+          materials={currentProject?.projectResources || []}
           onSave={onSaveResources}
           isAuthor={isAuth}
         />
       </>
 
       {/* Main Content */}
-      <div className='grid md:grid-cols-3 gap-6'>
-        <div className='md:col-span-2'>
-          <ProjectOverview current={currentProject} />
-          <div className='flex items-center gap-4 mt-0 mb-4'>
+      {currentProject ? (
+        <div className='grid md:grid-cols-3 gap-6'>
+          <div className='md:col-span-2'>
+            <ProjectOverview current={currentProject} />
+            <div className='flex items-center gap-4 mt-0 mb-4'>
+              {isAuth ? (
+                <>
+                  <Button
+                    onClick={() => setProjectModalOpen(true)}
+                    className='bg-black text-white'>
+                    Edit Project Details
+                  </Button>
+                  <Button
+                    onClick={() => setTeamModalOpen(true)}
+                    className='bg-black text-white'>
+                    Edit Team
+                  </Button>
+                </>
+              ) : null}
+            </div>
+
+            <ProjectTimeline tasks={currentProject.subtasks} />
             {isAuth ? (
-              <>
-                <Button
-                  onClick={() => setProjectModalOpen(true)}
-                  className='bg-black text-white'>
-                  Edit Project Details
-                </Button>
-                <Button
-                  onClick={() => setTeamModalOpen(true)}
-                  className='bg-black text-white'>
-                  Edit Team
-                </Button>
-              </>
+              <Button
+                onClick={() => setTaskModalOpen(true)}
+                className='mt-2 bg-black text-white'>
+                Edit Task Timeline
+              </Button>
             ) : null}
           </div>
-
-          <ProjectTimeline tasks={currentProject.subtasks} />
-          {isAuth ? (
-            <Button
-              onClick={() => setTaskModalOpen(true)}
-              className='mt-2 bg-black text-white'>
-              Edit Task Timeline
-            </Button>
-          ) : null}
+          <div>
+            <ProjectMessages />
+            <ProjectResources resources={currentProject.projectResources} />
+            {isAuth ? (
+              <Button
+                onClick={() => setResourcesModalOpen(true)}
+                className='mt-2 bg-black text-white'>
+                Edit Learning Materials
+              </Button>
+            ) : null}
+          </div>
         </div>
-        <div>
-          <ProjectMessages />
-          <ProjectResources resources={currentProject.projectResources} />
-          {isAuth ? (
-            <Button
-              onClick={() => setResourcesModalOpen(true)}
-              className='mt-2 bg-black text-white'>
-              Edit Learning Materials
-            </Button>
-          ) : null}
+      ) : (
+        <div className='flex flex-col items-center justify-center py-12'>
+          {UserProjects.length === 0 ? (
+            <div className='text-center'>
+              <h2 className='text-2xl font-bold mb-4'>No Projects Found</h2>
+              <p className='text-gray-600 mb-6'>
+                {isAuth
+                  ? "You haven't created any projects yet. Create your first project to get started."
+                  : "You haven't been assigned to any projects yet. Please check back later."}
+              </p>
+              {isAuth && (
+                <Button
+                  onClick={() => setCreateProjectModalOpen(true)}
+                  className='bg-blue-600 hover:bg-blue-700 text-white'>
+                  Create Your First Project
+                </Button>
+              )}
+            </div>
+          ) : (
+            <Loader />
+          )}
         </div>
-      </div>
+      )}
     </div>
-  ) : (
-    <Loader />
   );
 }
