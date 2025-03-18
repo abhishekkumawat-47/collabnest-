@@ -58,6 +58,7 @@ export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
 
 // Function to apply for a project
 async function applyToProject(applicantId: string, projectId: string): Promise<NextResponse<ApiResponse>> {
+  console.log(applicantId , projectId);
   if (!applicantId || !projectId) {
     return NextResponse.json({ error: "User ID and Project ID are required" }, { status: 400 });
   }
@@ -68,6 +69,17 @@ async function applyToProject(applicantId: string, projectId: string): Promise<N
 
   if (!user || !project) {
     return NextResponse.json({ error: "User or Project not found" }, { status: 404 });
+  }
+
+  // Check if the user has already applied for the project
+  const existingApplication = await prisma.application.findFirst({
+    where: {
+      applicantId: applicantId,
+      projectId: projectId,
+    },
+  });
+  if (existingApplication) {
+    return NextResponse.json({ error: "User has already applied for this project" }, { status: 409 });
   }
 
   // Create a new application entry

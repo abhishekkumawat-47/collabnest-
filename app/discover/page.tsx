@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -45,6 +45,13 @@ const Discovery = () => {
     createdAt: string; // ISO date string
     updatedAt: string;
     subtasks: string[];
+    applications: Application[];
+  }
+
+  interface Application {
+    id: string;
+    projectId: string;
+    applicantId: string;
   }
 
   const [allProjects, setAllProjects] = useState<Project[]>([]); // Stores all fetched projects
@@ -64,7 +71,9 @@ const Discovery = () => {
       .finally(() => setLoading(false)); // Stop loading
   }, []);
 
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(
+    null
+  );
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
   const [selectedDeadline, setSelectedDeadline] = useState<string | null>(null);
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
@@ -76,7 +85,9 @@ const Discovery = () => {
       allProjects.map((project) => {
         const deadlineToComplete = new Date(project.deadlineToComplete);
         const deadlineToApply = new Date(project.deadlineToApply);
-        const diffTime = Math.abs(deadlineToComplete.getTime() - deadlineToApply.getTime());
+        const diffTime = Math.abs(
+          deadlineToComplete.getTime() - deadlineToApply.getTime()
+        );
         return Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30)); // Convert to months
       })
     )
@@ -173,16 +184,21 @@ const Discovery = () => {
     error?: string;
   }
 
-  async function applyForProject(projectId: string): Promise<void> {
+  async function applyForProject(
+    projectId: string,
+    action: string
+  ): Promise<void> {
     try {
       const response = await fetch("/api/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          applicantId: "8b30846c-40cb-4577-ba9e-81c95d088a22",
+          applicantId: "2be256eb-1646-4033-9d0e-2955647ba627",
           projectId: projectId,
+          action,
         }),
       });
+
 
       if (!response.ok) {
         const data = await response.json();
@@ -190,27 +206,37 @@ const Discovery = () => {
       }
 
       const data: ApplicationResponse = await response.json();
-      console.log(data.message);
       alert("Project application successful!");
+
+      fetchUpdatedProjects();
     } catch (error) {
       console.error("Error applying for project:", error);
       alert("Failed to apply for project. Please try again later.");
     }
   }
 
+  async function fetchUpdatedProjects() {
+    setLoading(true); // Start loading
+    try {
+      const res = await fetch("/api/projects/All_Project");
+      const data = await res.json();
+      setAllProjects(data); // Keep all projects updated
+      setProjects(data); // Update the filtered projects
+    } catch (error) {
+      console.error("Error fetching updated projects:", error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  }
+
   const router = useRouter();
 
-  const handleApplyClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, projectId: string) => {
+  const handleStarClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    projectId: string
+  ) => {
     event.stopPropagation();
-    applyForProject(projectId);
   };
-
-  const handleStarClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, projectId: string) => {
-    event.stopPropagation();
-    // Handle star logic here
-    console.log(`Starring project ${projectId}`);
-  };
-
   return (
     <>
       <div className="mx-5">
@@ -341,7 +367,11 @@ const Discovery = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-4 mx-auto">
             {projects.map((project) => (
-              <Card key={project.id} onClick={() => router.push(`/projects/${project.id}`)} className="cursor-pointer">
+              <Card
+                key={project.id}
+                onClick={() => router.push(`/projects/${project.id}`)}
+                className="cursor-pointer"
+              >
                 <CardHeader>
                   <CardTitle className="text-2xl">{project.title}</CardTitle>
                   <CardDescription>{project.description}</CardDescription>
@@ -387,13 +417,31 @@ const Discovery = () => {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    className="w-auto bg-black text-white"
-                    onClick={(event) => handleApplyClick(event, project.id)}
-                  >
-                    Apply
-                  </Button>
+                  {project.applications
+                    .map((member) => member.applicantId)
+                    .includes("2be256eb-1646-4033-9d0e-2955647ba627") ? (
+                    <Button
+                      variant="outline"
+                      className="bg-black text-white"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        applyForProject(project.id, "withdraw");
+                      }}
+                    >
+                      Withdraw
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="bg-black text-white"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        applyForProject(project.id, "apply");
+                      }}
+                    >
+                      Apply
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     className="w-auto flex items-center"
