@@ -20,14 +20,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { PlusIcon, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-import { User } from "@/types/leaderboard";
-
-interface SubTask {
-  id: string;
-  title: string;
-  description: string;
-  completed: boolean;
-}
+import { Subtask } from "@/types/leaderboard";
 
 interface CreateProjectModalProps {
   isOpen: boolean;
@@ -44,9 +37,10 @@ interface CreateProjectModalProps {
     deadlineToApply: string;
     deadlineToComplete: string;
     applicantCapacity: number;
+    selectionCapacity: number;
     subheading: string;
+    subtasks: Subtask[];
     authorId: string;
-    author: User;
   }) => void;
 }
 
@@ -62,16 +56,13 @@ export default function CreateProjectModal({
   const [difficulty, setDifficulty] = useState("BEGINNER");
   const [deadlineToApply, setDeadlineToApply] = useState("");
   const [deadlineToComplete, setDeadlineToComplete] = useState("");
-  const [applicantCapacity, setApplicantCapacity] = useState(1);
+  const [applicantCapacity, setApplicantCapacity] = useState(100);
+  const [selectionCapacity, setSelectionCapacity] = useState(10);
   const [subheading, setSubheading] = useState("");
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reset form when modal is closed
   useEffect(() => {
-    if (!isOpen) {
-      resetForm();
-    }
+    if (!isOpen) resetForm();
   }, [isOpen]);
 
   const resetForm = () => {
@@ -81,7 +72,8 @@ export default function CreateProjectModal({
     setDifficulty("BEGINNER");
     setDeadlineToApply("");
     setDeadlineToComplete("");
-    setApplicantCapacity(1);
+    setApplicantCapacity(100);
+    setSelectionCapacity(10);
     setSubheading("");
     setIsSubmitting(false);
   };
@@ -103,31 +95,31 @@ export default function CreateProjectModal({
       title,
       subheading,
       description,
-      tags,
+      tags: tags
+        .join(",")
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t),
       difficulty,
-      deadlineToApply,
-      deadlineToComplete,
-      applicantCapacity: applicantCapacity,
-
-      author: currentUser,
+      subtasks: [],
+      deadlineToApply: new Date(deadlineToApply).toISOString(),
+      deadlineToComplete: new Date(deadlineToComplete).toISOString(),
+      applicantCapacity,
+      selectionCapacity,
+      authorId: currentUser.id,
     };
 
     try {
-      // Make POST request to create project
       const response = await fetch("/api/projects/Create", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(projectData),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create project");
-      }
+      if (!response.ok) throw new Error("Failed to create project");
 
       const data = await response.json();
-      onCreate(data); // Pass the response data to onCreate
+      onCreate(data);
       handleClose();
     } catch (error) {
       console.error("Error creating project:", error);
@@ -139,128 +131,205 @@ export default function CreateProjectModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className='max-w-2xl'>
-        <DialogHeader>
-          <DialogTitle className='text-xl font-bold'>
+      <DialogContent className='sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw] xl:max-w-[1200px] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 rounded-lg'>
+        <DialogHeader className='sticky top-0 bg-white border-b p-6 z-10'>
+          <DialogTitle className='text-2xl font-bold text-gray-800'>
             Create New Project
           </DialogTitle>
         </DialogHeader>
 
-        <div className='grid gap-4 py-4'>
-          <div className='grid gap-2'>
-            <Label htmlFor='title'>Project Title *</Label>
-            <Input
-              id='title'
-              placeholder='Enter project title'
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
+        <div className='flex-grow overflow-y-auto p-6 space-y-8'>
+          {/* Project Title and Subheading */}
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+            <div className='space-y-6'>
+              <div>
+                <Label
+                  htmlFor='title'
+                  className='text-lg font-medium text-gray-700 mb-2 block'>
+                  Project Title *
+                </Label>
+                <Input
+                  id='title'
+                  placeholder='Enter project title'
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className='text-lg p-4 h-14 rounded-md border-gray-300'
+                />
+              </div>
 
-          <div className='grid gap-2'>
-            <Label htmlFor='subheading'>Subheading</Label>
-            <Input
-              id='subheading'
-              placeholder='Enter a short subheading'
-              value={subheading}
-              onChange={(e) => setSubheading(e.target.value)}
-            />
-          </div>
+              <div>
+                <Label
+                  htmlFor='subheading'
+                  className='text-lg font-medium text-gray-700 mb-2 block'>
+                  Subheading
+                </Label>
+                <Input
+                  id='subheading'
+                  placeholder='Enter a short subheading'
+                  value={subheading}
+                  onChange={(e) => setSubheading(e.target.value)}
+                  className='p-4 h-14 rounded-md border-gray-300'
+                />
+              </div>
 
-          <div className='grid gap-2'>
-            <Label htmlFor='description'>Project Description *</Label>
-            <Textarea
-              id='description'
-              placeholder='Describe your project'
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div className='grid gap-2'>
-              <Label htmlFor='tags'>Tags</Label>
-              <Input
-                id='tags'
-                placeholder='Tags (comma separated)'
-                value={tags.join(", ")} // Display tags with a comma and space
-                onChange={(e) => {
-                  // Allow free typing without processing
-                  setTags([e.target.value]);
-                }}
-                onBlur={(e) => {
-                  // Process tags when the input loses focus
-                  const processedTags = e.target.value
-                    .split(",")
-                    .map((tag) => tag.trim())
-                    .filter((tag) => tag);
-                  setTags(processedTags);
-                }}
-              />
+              <div>
+                <Label
+                  htmlFor='difficulty'
+                  className='text-lg font-medium text-gray-700 mb-2 block'>
+                  Difficulty Level
+                </Label>
+                <Select value={difficulty} onValueChange={setDifficulty}>
+                  <SelectTrigger className='h-14 text-base rounded-md border-gray-300'>
+                    <SelectValue placeholder='Select difficulty' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='BEGINNER' className='text-base'>
+                      Beginner
+                    </SelectItem>
+                    <SelectItem value='INTERMEDIATE' className='text-base'>
+                      Intermediate
+                    </SelectItem>
+                    <SelectItem value='ADVANCED' className='text-base'>
+                      Advanced
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            <div className='grid gap-2'>
-              <Label htmlFor='difficulty'>Difficulty Level</Label>
-              <Select value={difficulty} onValueChange={setDifficulty}>
-                <SelectTrigger id='difficulty'>
-                  <SelectValue placeholder='Select difficulty' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='BEGINNER'>BEGINNER</SelectItem>
-                  <SelectItem value='INTERMEDIATE'>INTERMEDIATE</SelectItem>
-                  <SelectItem value='ADVANCED'>ADVANCED</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div className='grid gap-2'>
-              <Label htmlFor='deadlineToApply'>Deadline to Apply *</Label>
-              <Input
-                id='deadlineToApply'
-                type='date'
-                value={deadlineToApply}
-                onChange={(e) => setDeadlineToApply(e.target.value)}
-              />
-            </div>
-
-            <div className='grid gap-2'>
-              <Label htmlFor='deadlineToComplete'>Deadline to Complete *</Label>
-              <Input
-                id='deadlineToComplete'
-                type='date'
-                value={deadlineToComplete}
-                onChange={(e) => setDeadlineToComplete(e.target.value)}
+            <div>
+              <Label
+                htmlFor='description'
+                className='text-lg font-medium text-gray-700 mb-2 block'>
+                Project Description *
+              </Label>
+              <Textarea
+                id='description'
+                placeholder='Describe your project in detail...'
+                rows={8}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className='text-base p-4 h-64 rounded-md border-gray-300 resize-none'
               />
             </div>
           </div>
 
-          <div className='grid gap-2'>
-            <Label htmlFor='capacity'>Applicant Capacity</Label>
+          {/* Tags */}
+          <div>
+            <Label
+              htmlFor='tags'
+              className='text-lg font-medium text-gray-700 mb-2 block'>
+              Tags
+            </Label>
             <Input
-              id='capacity'
-              type='number'
-              min='1'
-              value={applicantCapacity}
+              id='tags'
+              placeholder='Comma separated tags (e.g., React, Node.js)'
+              value={tags.join(", ")}
               onChange={(e) =>
-                setApplicantCapacity(parseInt(e.target.value) || 1)
+                setTags(e.target.value.split(",").map((t) => t.trim()))
               }
+              className='p-4 h-14 rounded-md border-gray-300'
             />
+            <p className='text-sm text-gray-500 mt-2'>
+              Separate tags with commas
+            </p>
+          </div>
+
+          {/* Project Configuration */}
+          <div className='space-y-6'>
+            <h3 className='text-xl font-semibold text-gray-800 border-b pb-2'>
+              Project Configuration
+            </h3>
+
+            <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6'>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                <div>
+                  <Label
+                    htmlFor='deadlineToApply'
+                    className='text-base font-medium text-gray-700 mb-2 block'>
+                    Application Deadline *
+                  </Label>
+                  <Input
+                    id='deadlineToApply'
+                    type='date'
+                    value={deadlineToApply}
+                    onChange={(e) => setDeadlineToApply(e.target.value)}
+                    className='p-3 h-14 rounded-md border-gray-300'
+                  />
+                </div>
+
+                <div>
+                  <Label
+                    htmlFor='deadlineToComplete'
+                    className='text-base font-medium text-gray-700 mb-2 block'>
+                    Completion Deadline *
+                  </Label>
+                  <Input
+                    id='deadlineToComplete'
+                    type='date'
+                    value={deadlineToComplete}
+                    onChange={(e) => setDeadlineToComplete(e.target.value)}
+                    className='p-3 h-14 rounded-md border-gray-300'
+                  />
+                </div>
+              </div>
+
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                <div>
+                  <Label
+                    htmlFor='applicantCapacity'
+                    className='text-base font-medium text-gray-700 mb-2 block'>
+                    Applicant Capacity
+                  </Label>
+                  <Input
+                    id='applicantCapacity'
+                    type='number'
+                    min='1'
+                    value={applicantCapacity}
+                    onChange={(e) =>
+                      setApplicantCapacity(
+                        Math.max(1, parseInt(e.target.value) || 100)
+                      )
+                    }
+                    className='p-4 h-14 rounded-md border-gray-300'
+                  />
+                </div>
+
+                <div>
+                  <Label
+                    htmlFor='selectionCapacity'
+                    className='text-base font-medium text-gray-700 mb-2 block'>
+                    Selection Capacity
+                  </Label>
+                  <Input
+                    id='selectionCapacity'
+                    type='number'
+                    min='1'
+                    value={selectionCapacity}
+                    onChange={(e) =>
+                      setSelectionCapacity(
+                        Math.max(1, parseInt(e.target.value) || 10)
+                      )
+                    }
+                    className='p-4 h-14 rounded-md border-gray-300'
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className='sticky bottom-0 bg-gray-50 border-t p-6 flex justify-end gap-4'>
           <Button
-            onClick={handleClose}
             variant='outline'
-            disabled={isSubmitting}>
+            onClick={handleClose}
+            disabled={isSubmitting}
+            className='h-12 px-8 text-base rounded-md border-gray-300'>
             Cancel
           </Button>
           <Button
             onClick={handleCreateProject}
-            className='bg-blue-500 hover:bg-blue-600 text-white'
+            className='h-12 px-8 text-base bg-blue-600 hover:bg-blue-700 text-white rounded-md'
             disabled={isSubmitting}>
             {isSubmitting ? "Creating..." : "Create Project"}
           </Button>

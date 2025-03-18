@@ -1,50 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Console } from "console";
 
 export async function POST(req: NextRequest) {
   try {
+    // Attempt to parse JSON
+    let jsonBody;
+    try {
+      jsonBody = await req.json();
+    } catch (e) {
+      return NextResponse.json(
+        { message: "Invalid JSON format" },
+        { status: 400 }
+      );
+    }
+
     const {
       title,
-      subheading,
-      description,
-      tags,
-      difficulty,
-      deadlineToApply,
-      deadlineToComplete,
-      applicantCapacity,
-      authorId,
-      author,
-    } = await req.json();
+    description,
+    tags,
+    difficulty,
+    deadlineToApply,
+    deadlineToComplete,
+    applicantCapacity,
+    selectionCapacity,
+    subheading,subtasks,
+    authorId,
+    } = jsonBody;
 
-    // Validate required fields
+
+    // Validate required fields (remove 'author' from validation)
     if (
       !title ||
-      !subheading ||
       !description ||
       !tags ||
       !difficulty ||
       !deadlineToApply ||
       !deadlineToComplete ||
       !applicantCapacity ||
-      !authorId ||
-      !author
+      !authorId || !selectionCapacity // Only validate authorId
     ) {
       return NextResponse.json(
         { message: "All fields are required" },
-        { status: 400 }
+        { status: 400 } // Changed from 401 to 400
       );
     }
-    console.log(title,
-      subheading,
-      description,
-      tags,
-      difficulty,
-      deadlineToApply,
-      deadlineToComplete,
-      applicantCapacity,
-      
-      author,)
 
     // Validate dates
     const applyDate = new Date(deadlineToApply);
@@ -52,13 +51,13 @@ export async function POST(req: NextRequest) {
     if (isNaN(applyDate.getTime())) {
       return NextResponse.json(
         { message: "Invalid deadlineToApply date" },
-        { status: 400 }
+        { status: 400 } // Changed from 402 to 400
       );
     }
     if (isNaN(completeDate.getTime())) {
       return NextResponse.json(
         { message: "Invalid deadlineToComplete date" },
-        { status: 400 }
+        { status: 400 } // Changed from 402 to 400
       );
     }
 
@@ -70,20 +69,25 @@ export async function POST(req: NextRequest) {
         description,
         requirementTags: tags,
         difficultyTag: difficulty,
-        deadlineToApply: applyDate.toISOString(),
-        deadlineToComplete: completeDate.toISOString(),
+        deadlineToApply: applyDate,
+        deadlineToComplete: completeDate,
         applicantCapacity,
+        selectionCapacity,
+        subtasks:[],
         
-        author,
+        author: {
+          connect: {
+            id: authorId // Connect via authorId
+          }
+        }
       },
     });
 
-    // Return the created project
     return NextResponse.json(
       { message: "Project created successfully", project: newProject },
       { status: 201 }
     );
-  } catch (error) {
+   } catch (error) {
     console.error("Error creating project:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },

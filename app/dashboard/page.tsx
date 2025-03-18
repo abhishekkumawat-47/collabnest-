@@ -151,49 +151,8 @@ export default function Dashboard() {
     }
   };
 
-  const onCreateProject = async (projectData: {
-    id: string;
-    title: string;
-    description: string;
-    tags: string[];
-    difficulty: string;
-    deadline: string;
-    applicantCapacity: number;
-
-    authorId: string;
-    authorName: string;
-    members: string[];
-    updates: {
-      timestamp: string;
-      message: string;
-      updatedBy: string;
-    }[];
-  }) => {
-    try {
-      const response = await fetch(`/api/forDashboard/createProject/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(projectData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to create project: ${response.statusText}`);
-      }
-
-      const newProject = await response.json();
-
-      // Add the new project to the list and set it as current
-      setUserProjects((prevProjects) => [...prevProjects, newProject]);
-      setCurrentProject(newProject);
-      setCreateProjectModalOpen(false);
-
-      // Refresh the projects list to ensure everything is up to date
-      fetchProjects();
-    } catch (error) {
-      console.error("Error creating project:", error);
-    }
+  const onCreateProject = () => {
+    fetchProjects();
   };
 
   const onSaveTask = (updatedTasks: Subtask[]) => {
@@ -228,11 +187,13 @@ export default function Dashboard() {
       {/* Create Project Button - Only visible for authenticated authors */}
       {isAuth && (
         <div className='flex justify-end mb-6'>
-          <Button
-            onClick={() => setCreateProjectModalOpen(true)}
-            className='bg-blue-600 hover:bg-blue-700 text-white'>
-            Create New Project
-          </Button>
+          {UserProjects.length !== 0 && (
+            <Button
+              onClick={() => setCreateProjectModalOpen(true)}
+              className='bg-blue-600 hover:bg-blue-700 text-white'>
+              Create New Project
+            </Button>
+          )}
         </div>
       )}
 
