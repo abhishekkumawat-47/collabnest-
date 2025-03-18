@@ -45,13 +45,13 @@ const Discovery = () => {
     createdAt: string; // ISO date string
     updatedAt: string;
     subtasks: string[];
-    members: ProjectMember[];
+    applications: Application[];
   }
 
-  interface ProjectMember {
+  interface Application {
     id: string;
     projectId: string;
-    userId: string;
+    applicantId: string;
   }
 
   const [allProjects, setAllProjects] = useState<Project[]>([]); // Stores all fetched projects
@@ -69,7 +69,6 @@ const Discovery = () => {
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false)); // Stop loading
-      
   }, []);
 
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(
@@ -200,36 +199,44 @@ const Discovery = () => {
         }),
       });
 
+
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || data.message || "Application failed");
       }
 
       const data: ApplicationResponse = await response.json();
-      console.log(data.message);
       alert("Project application successful!");
+
+      fetchUpdatedProjects();
     } catch (error) {
       console.error("Error applying for project:", error);
       alert("Failed to apply for project. Please try again later.");
     }
   }
 
-  const router = useRouter();
+  async function fetchUpdatedProjects() {
+    setLoading(true); // Start loading
+    try {
+      const res = await fetch("/api/projects/All_Project");
+      const data = await res.json();
+      setAllProjects(data); // Keep all projects updated
+      setProjects(data); // Update the filtered projects
+    } catch (error) {
+      console.error("Error fetching updated projects:", error);
+    } finally {
+      setLoading(false); // Stop loading
+    }
+  }
 
-  // const handleApplyClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, projectId: string , action : string) => {
-  //   event.stopPropagation();
-  //   applyForProject(projectId , action);
-  // };
+  const router = useRouter();
 
   const handleStarClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     projectId: string
   ) => {
     event.stopPropagation();
-    // Handle star logic here
-    console.log(`Starring project ${projectId}`);
   };
-
   return (
     <>
       <div className="mx-5">
@@ -410,11 +417,9 @@ const Discovery = () => {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-end space-x-2">
-                  {project.members &&
-                  project.members.some(
-                    (member) =>
-                      member.userId === "2be256eb-1646-4033-9d0e-2955647ba627"
-                  ) ? (
+                  {project.applications
+                    .map((member) => member.applicantId)
+                    .includes("2be256eb-1646-4033-9d0e-2955647ba627") ? (
                     <Button
                       variant="outline"
                       className="bg-black text-white"

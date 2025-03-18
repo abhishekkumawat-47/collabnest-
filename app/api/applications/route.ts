@@ -58,6 +58,7 @@ export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
 
 // Function to apply for a project
 async function applyToProject(applicantId: string, projectId: string): Promise<NextResponse<ApiResponse>> {
+  console.log(applicantId , projectId);
   if (!applicantId || !projectId) {
     return NextResponse.json({ error: "User ID and Project ID are required" }, { status: 400 });
   }
