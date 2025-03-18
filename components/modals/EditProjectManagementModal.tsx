@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Project } from "@/types/leaderboard.ts";
+import { Button } from "../ui/button";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { Input } from "../ui/input";
 
 const EditProjectModal = ({
   isOpen,
@@ -73,7 +76,7 @@ const EditProjectModal = ({
       <div className='bg-white rounded-lg w-full max-w-lg'>
         <div className='flex justify-between items-center p-4 border-b'>
           <h2 className='text-lg font-medium'>Edit project details</h2>
-          <button
+          <Button
             onClick={onClose}
             className='text-gray-500 hover:text-gray-700'>
             <svg
@@ -86,7 +89,7 @@ const EditProjectModal = ({
               <line x1='18' y1='6' x2='6' y2='18'></line>
               <line x1='6' y1='6' x2='18' y2='18'></line>
             </svg>
-          </button>
+          </Button>
         </div>
 
         <div className='p-4'>
@@ -95,10 +98,10 @@ const EditProjectModal = ({
           </p>
 
           <div className='mb-4'>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
+            <Label className='block text-sm font-medium text-gray-700 mb-1'>
               Title
-            </label>
-            <input
+            </Label>
+            <Input
               type='text'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -108,9 +111,9 @@ const EditProjectModal = ({
           </div>
 
           <div className='mb-4'>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
+            <Label className='block text-sm font-medium text-gray-700 mb-1'>
               Description
-            </label>
+            </Label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -120,9 +123,9 @@ const EditProjectModal = ({
           </div>
 
           <div className='mb-4'>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
+            <Label className='block text-sm font-medium text-gray-700 mb-1'>
               Tags
-            </label>
+            </Label>
             <div className='flex flex-wrap gap-2 mb-2'>
               {tags.map((tag, index) => (
                 <span
@@ -138,7 +141,7 @@ const EditProjectModal = ({
               ))}
             </div>
             <div className='flex gap-2'>
-              <input
+              <Input
                 type='text'
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
@@ -146,20 +149,20 @@ const EditProjectModal = ({
                 className='w-full p-2 border rounded'
                 placeholder='Add a tag and press Enter'
               />
-              <button
+              <Button
                 onClick={addTag}
                 className='bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded'>
                 Add
-              </button>
+              </Button>
             </div>
           </div>
 
           <div className='mb-2'>
-            <label className='block text-sm font-medium text-gray-700 mb-1'>
+            <Label className='block text-sm font-medium text-gray-700 mb-1'>
               Deadline
-            </label>
+            </Label>
             <div className='relative'>
-              <input
+              <Input
                 type='date'
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
@@ -171,11 +174,11 @@ const EditProjectModal = ({
         </div>
 
         <div className='flex justify-end p-4 border-t'>
-          <button
+          <Button
             onClick={handleSave}
             className='bg-black hover:bg-black text-white px-4 py-2 rounded'>
             Save changes
-          </button>
+          </Button>
         </div>
       </div>
     </div>

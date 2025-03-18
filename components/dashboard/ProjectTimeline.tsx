@@ -1,44 +1,32 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Subtask } from "@/types/leaderboard";
+import { Subtask, Project } from "@/types/leaderboard";
 
 type Status = "OPEN" | "IN_PROGRESS" | "CLOSED";
 
 export function ProjectTimeline({ tasks }: { tasks: Subtask[] }) {
-  const [showAll, setShowAll] = useState(false);
-  const buttonText = showAll ? "Show Less" : "View All";
-
-  const toggleView = () => {
-    setShowAll(!showAll);
-  };
-
-  const displayedTasks = showAll ? tasks : tasks.slice(-3);
-
   return (
     <Card>
       <CardHeader className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
         <CardTitle className='text-xl font-bold'>Task Timeline</CardTitle>
-        {tasks.length > 3 && (
-          <Button variant='outline' size='sm' onClick={toggleView}>
-            {buttonText}
-          </Button>
-        )}
+        <Button variant='outline' size='sm'>
+          View All Tasks
+        </Button>
       </CardHeader>
       <CardContent>
         <div className='relative border-l border-gray-200 pl-6 pb-2 pt-2'>
-          {displayedTasks.map((tas, index) => {
-            const isLast = index === displayedTasks.length - 1;
+          {tasks.map((tas, index) => {
+            const isLast = index === tasks.length - 1; // Check if it's the last item
             return (
               <TimelineItem
                 key={tas.id}
-                status={mapping[tas.status.replace(" ", "_") as Status]}
+                status={mapping[tas.status.replace(" ", "_") as Status]} // Convert space to underscore for mapping
                 title={tas.title}
                 description={tas.description}
                 dueDate={tas.deadline ? tas.deadline.slice(0, 10) : ""}
-                isLast={isLast}
+                isLast={isLast} // Pass the isLast prop
               />
             );
           })}
@@ -48,6 +36,7 @@ export function ProjectTimeline({ tasks }: { tasks: Subtask[] }) {
   );
 }
 
+// Mapping object to convert Subtask status to TimelineItem status
 const mapping: { [key in Status]: "completed" | "in-progress" | "upcoming" } = {
   OPEN: "upcoming",
   IN_PROGRESS: "in-progress",
