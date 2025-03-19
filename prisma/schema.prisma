@@ -22,6 +22,7 @@ model User {
     branch                   String?
     department               String
     picture                  String?
+    cv                       String?         // Updated to store a single optional value
     accountCreatedAt         DateTime        @default(now())
     passwordChangedAt        DateTime?
     passwordResetToken       String?
