@@ -52,6 +52,7 @@ const Discovery = () => {
   const [projects, setProjects] = useState<Project[]>([]); // Stores filtered projects
 
   const [loading, setLoading] = useState<boolean>(true); // Loader state
+  const [recommendedProjectIds, setRecommendedProjectIds] = useState<string[]>([]);
 
 
   //hardcoding userid
@@ -85,7 +86,8 @@ const Discovery = () => {
 
         // Merge both lists with top 3 first
         setProjects([...topRecommended, ...remainingProjects]);
-        setProjects([...topRecommended, ...remainingProjects]);
+        setAllProjects([...topRecommended, ...remainingProjects]);
+        setRecommendedProjectIds([...recommendedIds]);
       
 
         // // Fetch all projects
@@ -363,70 +365,78 @@ const Discovery = () => {
         {loading ? (
           <Loader />
         ) : (
-          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-4 mx-auto'>
-            {projects.map((project) => (
-              <Card key={project.id}>
-                <CardHeader>
-                  <CardTitle className='text-2xl'>{project.title}</CardTitle>
-                  <CardDescription>{project.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className='flex flex-wrap mb-4'>
-                    {project.requirementTags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className='bg-black text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded mb-2'>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mb-4 mx-auto">
+  {projects.map((project) => {
+    const isRecommended = recommendedProjectIds.includes(project.id);
+    return (
+      <Card
+        key={project.id}
+        className={`relative p-4 transition-shadow duration-300 ${
+          isRecommended ? "shadow-lg border-2 border-yellow-500" : "shadow-md"
+        }`}
+      >
+        {/* "Recommended" Badge */}
+        {isRecommended && (
+          <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-s font-bold px-3 py-1 rounded">
+  Recommended
+</div>
 
-                  <div className='text-gray-600 text-sm space-y-2'>
-                    <p className='flex items-center'>
-                      <Calendar className='h-4 w-4 mr-2' />
-                      <span className='font-semibold'>Apply by:</span>{" "}
-                      {formatDate(project.deadlineToApply)}
-                    </p>
+        )}
 
-                    <p>
-                      <span className='font-semibold'>Duration:</span>{" "}
-                      {(() => {
-                        const deadlineToComplete = new Date(
-                          project.deadlineToComplete
-                        );
-                        const deadlineToApply = new Date(
-                          project.deadlineToApply
-                        );
-                        const diffTime = Math.abs(
-                          deadlineToComplete.getTime() -
-                          deadlineToApply.getTime()
-                        );
-                        const diffDays = Math.ceil(
-                          diffTime / (1000 * 60 * 60 * 24)
-                        );
-                        return `${diffDays} days`;
-                      })()}
-                    </p>
-                  </div>
-                </CardContent>
-                <CardFooter className='flex justify-end space-x-2'>
-                  <Button
-                    onClick={() => {
-                      applyForProject(project.id);
-                    }}
-                    variant='outline'
-                    className='w-auto bg-black text-white'>
-                    Apply
-                  </Button>
-                  <Button
-                    variant='outline'
-                    className='w-auto flex items-center'>
-                    <FaStar className='mr-0.5' /> Star
-                  </Button>
-                </CardFooter>
-              </Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">{project.title}</CardTitle>
+          <CardDescription>{project.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap mb-4">
+            {project.requirementTags.map((tag, index) => (
+              <span
+                key={index}
+                className="bg-black text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded mb-2"
+              >
+                {tag}
+              </span>
             ))}
           </div>
+
+          <div className="text-gray-600 text-sm space-y-2">
+            <p className="flex items-center">
+              <Calendar className="h-4 w-4 mr-2" />
+              <span className="font-semibold">Apply by:</span>{" "}
+              {formatDate(project.deadlineToApply)}
+            </p>
+
+            <p>
+              <span className="font-semibold">Duration:</span>{" "}
+              {(() => {
+                const deadlineToComplete = new Date(project.deadlineToComplete);
+                const deadlineToApply = new Date(project.deadlineToApply);
+                const diffTime = Math.abs(
+                  deadlineToComplete.getTime() - deadlineToApply.getTime()
+                );
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return `${diffDays} days`;
+              })()}
+            </p>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-end space-x-2">
+          <Button
+            onClick={() => applyForProject(project.id)}
+            variant="outline"
+            className="w-auto bg-black text-white"
+          >
+            Apply
+          </Button>
+          <Button variant="outline" className="w-auto flex items-center">
+            <FaStar className="mr-0.5" /> Star
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  })}
+</div>
+
         )}{" "}
       </div>
     </>
