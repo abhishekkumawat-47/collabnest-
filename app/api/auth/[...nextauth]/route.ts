@@ -20,6 +20,7 @@ export const authOptions: NextAuthOptions = {
         async signIn({ account, profile }) {
             // ✅ Restrict to iitp.ac.in email
             // return true;
+            console.log('profile', account, profile);
             if (profile?.email?.endsWith('@iitp.ac.in')) {
                 return true;
             }
