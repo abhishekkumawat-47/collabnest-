@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +31,8 @@ export function ProjectMessages() {
       time: "1h ago",
     },
   ];
+
+  const projectId = "b37e8403-9944-462f-9964-5674386007a6"; // Define the projectId variable
 
   return (
     <Card className='mb-6'>
@@ -65,9 +68,12 @@ export function ProjectMessages() {
             </div>
           </div>
         ))}
-        <Button className='w-full' variant='outline'>
-          Reply to Messages
-        </Button>
+        <Link
+        href={`/chat-window/${projectId}`}
+        className="text-blue-600 underline"
+      >
+        View All Messages
+      </Link>
       </CardContent>
     </Card>
   );
