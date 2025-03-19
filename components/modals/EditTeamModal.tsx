@@ -56,7 +56,9 @@ const EditTeamModal = ({
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/pending/${projectData.id}`);
+      const response = await fetch(
+        `/api/forDashboard/fetch_applications/${projectData.id}`
+      );
       if (!response.ok) throw new Error(await response.text());
 
       const data = await response.json();
@@ -107,7 +109,7 @@ const EditTeamModal = ({
       setError("");
 
       // Send PUT request with accepted and rejected IDs
-      const response = await fetch(`/api/bulk`, {
+      const response = await fetch(`/api/forDashboard/update_applications`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ acceptedIds, rejectedIds }),
