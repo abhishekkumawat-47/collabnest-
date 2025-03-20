@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ProjectOverview } from "@/components/dashboard/ProjectOverview";
@@ -12,8 +12,12 @@ import EditTeamModal from "@/components/modals/EditTeamModal";
 import EditTaskTimelineModal from "@/components/modals/EditTaskTimelineModal";
 import EditLearningMaterialsModal from "@/components/modals/EditLearningMaterialsModal";
 import CreateProjectModal from "@/components/modals/CreateProjectModal";
+import EndProjectModal from "@/components/modals/EndProjectModal";
+import EndButton from "@/components/ui/end-button";
 import { Project, Subtask, User, Role } from "@/types/leaderboard.ts";
 import Loader from "@/components/Loader";
+import { useSession } from "next-auth/react";
+import { useProject } from "../context/projectContext";
 
 export default function Dashboard() {
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
@@ -21,13 +25,30 @@ export default function Dashboard() {
   const [isTaskModalOpen, setTaskModalOpen] = useState(false);
   const [isResourcesModalOpen, setResourcesModalOpen] = useState(false);
   const [isCreateProjectModalOpen, setCreateProjectModalOpen] = useState(false);
-  const id = "addd061b-6883-4bab-a355-4479bf659623"; // User ID (should come from auth system)
+
+  const [isEndProjectModalOpen, setEndProjectModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  //const id = "addd061b-6883-4bab-a355-4479bf659623"; // User ID (should come from auth system)
+
+  // const id = "addd061b-6883-4bab-a355-4479bf659623";
+
+  const { currentProject, setCurrentProject } = useProject(); // ✅ Use context instead of useState
+
   const [UserProjects, setUserProjects] = useState<Project[]>([]);
-  const [currentProject, setCurrentProject] = useState<Project | null>(null);
+  // const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [curr_user, setUser] = useState<User | null>(null);
+  const [projectStatus, setProjectStatus] = useState<string | null>(null); // New state for project status
   const project_id = useRef("");
   const isAuth = curr_user?.role !== "USER"; // Authentication status (should come from auth system)
 
+  const [id,setId] = useState("addd061b-6883-4bab-a355-4479bf659623"); // User ID (should come from auth system)
+
+  const { data: session, status } = useSession();
+  console.log(status);
+  if(status!="authenticated"){
+    window.location.href = '/welcome';
+  }
+  
   const handleCurrentProject = (project: Project) => {
     setCurrentProject(project);
   };
@@ -93,6 +114,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (currentProject?.id) {
       project_id.current = currentProject.id;
+      setProjectStatus(currentProject.status); // Update project status state
     }
   }, [currentProject]);
 
@@ -175,6 +197,44 @@ export default function Dashboard() {
     fetchProjects();
   };
 
+  const onEndProject = async (ratings: { [userId: string]: number }) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/forDashboard/endProject/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          projectId: currentProject?.id,
+          ratings,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to end project: ${response.statusText}`);
+      }
+  
+      // Update project status immediately
+      setCurrentProject((prev) =>
+        prev ? { ...prev, status: "CLOSED" } : prev
+      );
+      setProjectStatus("CLOSED"); // Update UI immediately
+  
+      setEndProjectModalOpen(false);
+    } catch (error) {
+      console.error("Error ending project:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
+  const onIssueCertificate = () => {
+    // Implement the logic to issue certificates
+    console.log('Issuing certificates for project:', currentProject?.id);
+  };
+
   return (
     <div className='container mx-auto py-8 px-4 md:px-8'>
       <WelcomeHeader
@@ -235,6 +295,15 @@ export default function Dashboard() {
           onSave={onSaveResources}
           isAuthor={isAuth}
         />
+        <EndProjectModal
+          isOpen={isEndProjectModalOpen}
+          onClose={() => setEndProjectModalOpen(false)}
+          onEndProject={onEndProject}
+          contributors={currentProject?.members.map((member) => ({
+            id: member.user.id,
+            name: member.user.name,
+          })) || []}
+        />
       </>
 
       {/* Main Content */}
@@ -261,11 +330,35 @@ export default function Dashboard() {
 
             <ProjectTimeline tasks={currentProject.subtasks} />
             {isAuth ? (
-              <Button
-                onClick={() => setTaskModalOpen(true)}
-                className='mt-2 bg-black text-white'>
-                Edit Task Timeline
-              </Button>
+              <>
+                {projectStatus !== "CLOSED" && (
+                  <>
+                    <Button
+                      onClick={() => setTaskModalOpen(true)}
+                      className='mt-2 bg-black text-white'>
+                      Edit Task Timeline
+                    </Button>
+                    <EndButton
+                      onClick={() => setEndProjectModalOpen(true)}
+                      className='mt-2 bg-red-600 text-white'
+                      disabled={isLoading}>
+                      {isLoading ? "Ending Project..." : "End Project"}
+                    </EndButton>
+                  </>
+                )}
+                {projectStatus === "CLOSED" && (
+                  <>
+                    <Button className='mt-2 bg-gray-500 text-white' disabled>
+                      Closed
+                    </Button>
+                    <Button
+                      onClick={onIssueCertificate}
+                      className='mt-2 ml-2 bg-blue-500 text-white'>
+                      Issue Certificate
+                    </Button>
+                  </>
+                )}
+              </>
             ) : null}
           </div>
           <div>

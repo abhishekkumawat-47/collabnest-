@@ -3,18 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { GraduationCap, Mail, MapPin, Briefcase, QrCode, University } from 'lucide-react';
-
-const hardcodedUserId = '2487e9e1-b723-4cf9-84a6-cc04efae3365';
+import { useSession } from 'next-auth/react';
+import { Loader } from './Loader'; // Import the Loader component
 
 export const UserDetails = () => {
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`/api/forProfile/byUserId/${hardcodedUserId}`);
+        const response = await fetch(`/api/forProfile/byEmail/${session?.user?.email}`);
         if (!response.ok) throw new Error('Failed to fetch user data');
 
         const data = await response.json();
@@ -27,10 +28,24 @@ export const UserDetails = () => {
       }
     };
 
-    fetchUserData();
-  }, []);
+    if (session?.user?.email) {
+      fetchUserData();
+    }
+  }, [session?.user?.email]);
 
-  if (loading) return <p>Loading user details...</p>;
+  if (loading) return (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>Personal Information</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-center h-32">
+          <Loader center text="Loading user information..." />
+        </div>
+      </CardContent>
+    </Card>
+  );
+  
   if (error) return <p className="text-red-500">{error}</p>;
 
   const detailsData = [
@@ -64,7 +79,6 @@ export const UserDetails = () => {
       label: 'College',
       value: 'Indian Institute of Technology, Patna',
     },
-    
   ];
 
   return (

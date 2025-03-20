@@ -69,7 +69,7 @@ export function ProjectMessages() {
           </div>
         ))}
         <Link
-        href={`/chat-window/${projectId}`}
+        href={`/dashboard/chat-window/${projectId}`}
         className="text-blue-600 underline"
       >
         View All Messages

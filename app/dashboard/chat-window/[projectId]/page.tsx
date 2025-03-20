@@ -6,7 +6,11 @@ import { Send, ArrowLeft } from "lucide-react";
 import Link from 'next/link';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import ProjectDetailsModal from "../../../components/modals/ProjectDetailsModal";
+
+
+
+import { useProject } from "../../../context/projectContext";
+
 interface Message {
   id: string;
   projectId: string;
@@ -21,7 +25,9 @@ interface User {
 }
 
 export default function ChatWindowPage() {
-  const projectId = "b37e8403-9944-462f-9964-5674386007a6";
+
+  const { currentProject } = useProject();
+  const projectId = currentProject?.id;
 
   // Hardcode a "current user" for the example
   const currentUserId = "addd061b-6883-4bab-a355-4479bf659623";
@@ -140,7 +146,7 @@ export default function ChatWindowPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
-        <h2 className="text-xl font-semibold flex-grow">Project Chat: {projectId.substring(0, 8)}...</h2>
+        <h2 className="text-xl font-semibold flex-grow">Project Chat: {projectId ? projectId.substring(0, 8) : 'Loading'}...</h2>
         <Link href={`/project/${projectId}`}>
           <Button variant="outline" size="sm">Project Details</Button>
         </Link>
