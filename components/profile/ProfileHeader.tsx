@@ -5,11 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Edit, Settings } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-
-const hardcodedUserId = '2487e9e1-b723-4cf9-84a6-cc04efae3365';
+import { Loader } from './Loader'; // Import the Loader component
 
 export const ProfileHeader = () => {
-const { data: session, status } = useSession();
+  const { data: session, status } = useSession();
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +20,6 @@ const { data: session, status } = useSession();
         if (!response.ok) throw new Error('Failed to fetch user data');
         const data = await response.json();
         console.log(data);
-        // const data = session.user;
         setUserData(data);
       } catch (err) {
         setError('Error fetching user details');
@@ -32,9 +30,14 @@ const { data: session, status } = useSession();
     };
 
     fetchUserData();
-  }, []);
+  }, [session?.user?.email]);
 
-  if (loading) return <p>Loading user details...</p>;
+  if (loading) return (
+    <div className="flex items-center justify-center h-32">
+      <Loader center text="Loading profile..." />
+    </div>
+  );
+  
   if (error) return <p className="text-red-500">{error}</p>;
 
   const getInitials = (name: string) => {

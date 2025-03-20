@@ -17,6 +17,7 @@ import EndButton from "@/components/ui/end-button";
 import { Project, Subtask, User, Role } from "@/types/leaderboard.ts";
 import Loader from "@/components/Loader";
 import { useSession } from "next-auth/react";
+import { useProject } from "../context/projectContext";
 
 export default function Dashboard() {
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
@@ -34,7 +35,7 @@ export default function Dashboard() {
   const { currentProject, setCurrentProject } = useProject(); // ✅ Use context instead of useState
 
   const [UserProjects, setUserProjects] = useState<Project[]>([]);
-  const [currentProject, setCurrentProject] = useState<Project | null>(null);
+  // const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [curr_user, setUser] = useState<User | null>(null);
   const [projectStatus, setProjectStatus] = useState<string | null>(null); // New state for project status
   const project_id = useRef("");
