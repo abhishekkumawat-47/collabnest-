@@ -5,10 +5,92 @@ import Image from 'next/image';
 import { colors } from '@/const';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useEffect } from 'react';
 
 export default function LandingPage() {
     const params = useSearchParams();
     const error = params.get('error');
+
+    const { data: session, status } = useSession();
+    console.log("Session -----------> ", session);
+
+    // Session ----------->  {
+    //     user: {
+    //       name: 'Rishikumar Heeralal Gautam',
+    //       email: 'rishi_2301cs83@iitp.ac.in',
+    //       image: null
+    //     }
+    //   }
+
+    function extractProgramCode(rollNumber:String) {
+        return rollNumber.substring(2, 4);
+      }
+
+      function getProgramName(programCode: string): string {
+        const programs: Record<string, string> = {
+          "01": "BTech",
+          "02": "MTech",
+          "11": "BSc",
+          "12": "MSc"
+        };
+        
+        return programs[programCode] || "Unknown Program";
+      }
+
+      function extractDepartment(rollNumber:String) {
+        return rollNumber.substring(4, 6);
+      }
+
+    function extractRollFromEmail(email: string) {
+        let userId = email.split("@")[0];
+        let isFirstPartInt = !isNaN(parseInt(userId[0]));
+        return isFirstPartInt ? userId.split("_")[0] : userId.split("_")[1];
+      }
+
+      function extractStartingYear(rollNumber:string) {
+        const yearPrefix = rollNumber.substring(0, 2);
+        return (2000 + parseInt(yearPrefix, 10)).toString();
+      }
+
+    useEffect(() => {
+        // When user is authenticated, create or check user in the database
+        const createUserIfNeeded = async () => {
+            if (status === "authenticated" && session?.user?.name && session?.user?.email) {
+                try {
+                    // Call your API to create the user (will handle existing emails)
+                    const response = await fetch('/api/addUser', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            name: session.user.name,
+                            email: session.user.email,
+                            roll: extractRollFromEmail(session.user.email),
+                            department: extractDepartment(extractRollFromEmail(session.user.email)),
+                            degree: getProgramName(extractProgramCode(extractRollFromEmail(session.user.email))),
+                            year: extractStartingYear(extractRollFromEmail(session.user.email)),
+
+
+                        }),
+                    });
+
+                    const data = await response.json();
+                    console.log('User creation response:', data);
+                    
+                    // Redirect to dashboard after user is created or verified
+                    window.location.href = '/dashboard';
+                    
+                } catch (error) {
+                    console.error('Error creating user:', error);
+                    // You might want to handle this error differently
+                }
+            }
+        };
+
+        createUserIfNeeded();
+    }, [status, session]);
 
     return (
         <div className="flex flex-col md:flex-row min-h-screen">

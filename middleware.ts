@@ -1,10 +1,30 @@
+import { getToken } from 'next-auth/jwt';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { useSession } from 'next-auth/react';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const userType = request.cookies.get('userType')?.value;
+
+  // const { data: session, status } = useSession();
+
+  // console.log("frehfierifjiernvcuinrio voir vo kreok vferk",status);
   // Replace this with actual user type fetching logic
+  
+  const token = await getToken({ 
+    req: request, 
+    secret: process.env.NEXTAUTH_SECRET 
+  });
+  
+  // console.log("Token fetched -----------> ");
  
+
+  console.log("Token fetched -----------> ",token);
+  if(token){
+    return NextResponse.redirect(new URL('/dashboard',request.url));
+  }
+
+  
 
   if (!userType) {
     return NextResponse.redirect(new URL('/login', request.url));

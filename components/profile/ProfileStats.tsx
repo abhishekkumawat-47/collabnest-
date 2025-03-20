@@ -15,7 +15,7 @@ export const ProfileStats = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`/api/forProfile/byUserId/${hardcodedUserId}`);
+        const response = await fetch(`/api/forProfile/byEmail/${hardcodedUserId}`);
         if (!response.ok) throw new Error('Failed to fetch user data');
 
         const data = await response.json();
