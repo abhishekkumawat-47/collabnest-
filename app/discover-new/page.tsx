@@ -245,7 +245,7 @@ const Discovery = () => {
       }
 
       const data: ApplicationResponse = await response.json();
-      alert("Project application successful!");
+      alert("Project application/withdrawal successful!");
 
       fetchUpdatedProjects();
     } catch (error) {
