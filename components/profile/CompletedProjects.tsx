@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 
-
+const hardcodedUserId = "2487e9e1-b723-4cf9-84a6-cc04efae3365";
 
 interface Project {
   id: string;
@@ -16,7 +16,7 @@ interface Project {
   deadlineToComplete?: string;
 }
 
-export const CompletedProjects = ({id}:{id:string}) => {
+export const CompletedProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +25,7 @@ export const CompletedProjects = ({id}:{id:string}) => {
   useEffect(() => {
     const fetchCompletedProjects = async () => {
       try {
-        const response = await fetch(`/api/projects/completed/${id}`);
+        const response = await fetch(`/api/projects/completed/${hardcodedUserId}`);
         if (!response.ok) throw new Error("Failed to fetch projects");
 
         const data = await response.json();
@@ -68,7 +68,7 @@ export const CompletedProjects = ({id}:{id:string}) => {
                   </div>
                   <div className="mt-2 flex space-x-2">
                     {project.requirementTags.map((domain) => (
-                      <Badge key={`item-${Date.now()}-${Math.random()}`} variant="outline">
+                      <Badge key={domain} variant="outline">
                         {domain}
                       </Badge>
                     ))}
