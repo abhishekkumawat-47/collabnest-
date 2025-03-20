@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download } from 'lucide-react';
  
-export const CVSection = ({id}:{id:string}) => {
+export const CVSection = () => {
   return (
     <Card>
       <CardHeader>

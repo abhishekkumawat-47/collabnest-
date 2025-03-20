@@ -21,7 +21,6 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
-import Link from "next/link";
 
 const ProjectDetailsModal = ({
   isOpen,
@@ -139,10 +138,7 @@ const ProjectDetailsModal = ({
                           {member.user.name.charAt(0)}
                         </div>
                         <div>
-                          <Link href={`/profile/${member.userId}`}>
-                            <div className='font-medium'>{member.user.name}</div>
-                          </Link>
-                          
+                          <div className='font-medium'>{member.user.name}</div>
                         </div>
                       </div>
                     ))}
