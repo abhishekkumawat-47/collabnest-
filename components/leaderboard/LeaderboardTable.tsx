@@ -10,6 +10,7 @@ import {
 import { LeaderboardEntry } from '@/types/leaderboard';
 import { LeaderboardUserAvatar } from '@/components/leaderboard/LeaderboardUserAvatar';
 import { LeaderboardUserDomains } from '@/components/leaderboard/LeaderboardUserDomains';
+import Link from 'next/link';
 
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[];
@@ -19,6 +20,8 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ entries }) =
   if (!entries || !Array.isArray(entries)) {
     return <div>No data available</div>;
   }
+
+ 
 
   return (
     <Table>
@@ -41,7 +44,10 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ entries }) =
                   name={entry.name} 
                   avatarUrl="/placeholder-avatar.png" 
                 />
-                <span>{entry.name}</span>
+                <Link href={`/profile/${entry.id}`}>
+                  <span>{entry.name}</span>
+                </Link>
+                
               </div>
             </TableCell>
             <TableCell>
