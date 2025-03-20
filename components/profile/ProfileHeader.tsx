@@ -4,11 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Edit, Settings } from 'lucide-react';
-import { useSession } from 'next-auth/react';
-import { Loader } from './Loader'; // Import the Loader component
 
-export const ProfileHeader = () => {
-  const { data: session, status } = useSession();
+
+
+export const ProfileHeader = ({id}:{id:string}) => {
+
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -16,10 +16,10 @@ export const ProfileHeader = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`/api/forProfile/byEmail/${session?.user?.email}`);
+        const response = await fetch(`/api/forProfile/byUserId/${id}`);
         if (!response.ok) throw new Error('Failed to fetch user data');
+
         const data = await response.json();
-        console.log(data);
         setUserData(data);
       } catch (err) {
         setError('Error fetching user details');
@@ -30,14 +30,9 @@ export const ProfileHeader = () => {
     };
 
     fetchUserData();
-  }, [session?.user?.email]);
+  }, []);
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-32">
-      <Loader center text="Loading profile..." />
-    </div>
-  );
-  
+  if (loading) return <p>Loading user details...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   const getInitials = (name: string) => {
@@ -62,9 +57,7 @@ export const ProfileHeader = () => {
         <Button variant="outline" size="icon">
           <Edit className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="icon">
-          <Settings className="h-4 w-4" />
-        </Button>
+        
       </div>
     </div>
   );

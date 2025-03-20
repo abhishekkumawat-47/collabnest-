@@ -6,9 +6,9 @@ import { ProfileBadges } from "@/components/profile/ProfileBadges";
 import { CompletedProjects } from "@/components/profile/CompletedProjects";
 import { UserDetails } from "@/components/profile/UserDetails";
 import { CVSection } from "@/components/profile/CVSection";
-export default function ProfilePage() {
-    const userId  ="1c1d2c2d-7d46-4cbf-8d4a-93e9e97e5600" 
-;  
+export default function ProfilePage({ params }: { params: { userId: string } }) {
+    const { userId } = params;
+  
     return (
       <>
         <div className='container mx-auto py-8 px-4 md:px-8 lg:max-w-320'>

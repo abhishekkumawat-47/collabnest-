@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, XCircle } from "lucide-react";
 
-const hardcodedUserId = "2487e9e1-b723-4cf9-84a6-cc04efae3365";
+
 
 interface Project {
   id: string;
@@ -17,7 +17,7 @@ interface Project {
   status: string;
 }
 
-export const RecentActivity = () => {
+export const RecentActivity = ({id}:{id:string}) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ export const RecentActivity = () => {
   useEffect(() => {
     const fetchAppliedProjects = async () => {
       try {
-        const response = await fetch(`/api/projects/applied/${hardcodedUserId}`);
+        const response = await fetch(`/api/projects/applied/${id}`);
         if (!response.ok) throw new Error("Failed to fetch applied projects");
 
         const data = await response.json();
@@ -69,7 +69,7 @@ export const RecentActivity = () => {
                   </div>
                   <div className="mt-2 flex space-x-2">
                     {project.requirementTags.map((tag) => (
-                      <Badge key={tag} variant="outline">
+                      <Badge key={`item-${Date.now()}-${Math.random()}`} variant="outline">
                         {tag}
                       </Badge>
                     ))}
