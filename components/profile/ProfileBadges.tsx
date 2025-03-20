@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FaMedal } from 'react-icons/fa';
+import { useSession } from 'next-auth/react';
 
 const hardcodedUserId = '2487e9e1-b723-4cf9-84a6-cc04efae3365';
 
@@ -29,11 +30,12 @@ export const ProfileBadges = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
-
+  const { data: session, status } = useSession();
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`/api/forProfile/byUserId/${hardcodedUserId}`);
+        const response = await fetch(`/api/forProfile/byEmail/${session?.user?.email}`);
         if (!response.ok) throw new Error('Failed to fetch user data');
 
         const data = await response.json();

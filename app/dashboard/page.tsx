@@ -14,6 +14,7 @@ import EditLearningMaterialsModal from "@/components/modals/EditLearningMaterial
 import CreateProjectModal from "@/components/modals/CreateProjectModal";
 import { Project, Subtask, User, Role } from "@/types/leaderboard.ts";
 import Loader from "@/components/Loader";
+import { useSession } from "next-auth/react";
 
 export default function Dashboard() {
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
@@ -21,13 +22,21 @@ export default function Dashboard() {
   const [isTaskModalOpen, setTaskModalOpen] = useState(false);
   const [isResourcesModalOpen, setResourcesModalOpen] = useState(false);
   const [isCreateProjectModalOpen, setCreateProjectModalOpen] = useState(false);
-  const id = "addd061b-6883-4bab-a355-4479bf659623"; // User ID (should come from auth system)
+  // const id = "addd061b-6883-4bab-a355-4479bf659623";
   const [UserProjects, setUserProjects] = useState<Project[]>([]);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
   const [curr_user, setUser] = useState<User | null>(null);
   const project_id = useRef("");
   const isAuth = curr_user?.role !== "USER"; // Authentication status (should come from auth system)
 
+  const [id,setId] = useState("addd061b-6883-4bab-a355-4479bf659623"); // User ID (should come from auth system)
+
+  const { data: session, status } = useSession();
+  console.log(status);
+  if(status!="authenticated"){
+    window.location.href = '/welcome';
+  }
+  
   const handleCurrentProject = (project: Project) => {
     setCurrentProject(project);
   };
