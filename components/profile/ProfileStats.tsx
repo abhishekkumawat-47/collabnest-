@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Star, BookOpen, Target } from 'lucide-react';
-import { useSession } from 'next-auth/react';
-import { Loader } from './Loader'; // Import the Loader component
 
-export const ProfileStats = () => {
-  const { data: session } = useSession();
+
+
+export const ProfileStats = ({id}:{id:string}) => {
+  
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +15,7 @@ export const ProfileStats = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`/api/forProfile/byEmail/${session?.user?.email}`);
+        const response = await fetch(`/api/forProfile/byUserId/${id}`);
         if (!response.ok) throw new Error('Failed to fetch user data');
 
         const data = await response.json();
@@ -28,24 +28,16 @@ export const ProfileStats = () => {
       }
     };
 
-    if (session?.user?.email) {
-      fetchUserData();
-    }
-  }, [session?.user?.email]);
+    fetchUserData();
+  }, []);
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-40">
-      <Loader center text="Loading statistics..." />
-    </div>
-  );
-  
-  if (error) return <p className="text-red-500">{error}</p>;
+
 
   const stats = [
     {
       icon: Trophy,
       title: "Total Projects",
-      value: (userData?.projectsParticipated?.length || 0) + (userData?.projectsCreated?.length || 0)
+      value: userData?.projectsParticipated?.length || 0 + userData?.projectsCreated?.length || 0
     },
     {
       icon: Star,
@@ -60,6 +52,7 @@ export const ProfileStats = () => {
     }
   ];
   
+
   const ratingData = [
     {
       icon: BookOpen,
