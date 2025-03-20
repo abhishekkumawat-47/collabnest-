@@ -21,13 +21,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { FaStar } from "react-icons/fa";
 import { Calendar } from "lucide-react";
 import Loader from "@/components/Loader";
 
 const Discovery = () => {
   type Status = "OPEN" | "CLOSED";
   type DifficultyTag = "INTERMEDIATE" | "BEGINNER" | "ADVANCED";
+
   interface Project {
     id: string;
     authorId: string;
@@ -38,11 +38,11 @@ const Discovery = () => {
     deadlineToApply: string; // ISO date string
     deadlineToComplete: string; // ISO date string
     difficultyTag: DifficultyTag;
-    requirementTags: string[]; // JSON array
+    requirementTags: string[];
     applicantCapacity: number;
     selectionCapacity: number;
-    projectResources: any[]; // JSON array
-    createdAt: string; // ISO date string
+    projectResources: any[];
+    createdAt: string;
     updatedAt: string;
     subtasks: string[];
     applications: Application[];
@@ -54,135 +54,23 @@ const Discovery = () => {
     applicantId: string;
   }
 
-  const [allProjects, setAllProjects] = useState<Project[]>([]); // Stores all fetched projects
-  const [projects, setProjects] = useState<Project[]>([]); // Stores filtered projects
-  const [loading, setLoading] = useState<boolean>(true); // Loader state
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setLoading(true); // Start loading
-
+    setLoading(true);
     fetch("/api/projects/All_Project")
       .then((res) => res.json())
       .then((data) => {
-        setAllProjects(data); // Keep all projects
-        setProjects(data); // Show all projects initially
+        setAllProjects(data);
+        setProjects(data);
       })
       .catch((err) => console.error(err))
-      .finally(() => setLoading(false)); // Stop loading
+      .finally(() => setLoading(false));
   }, []);
 
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(
-    null
-  );
-  const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
-  const [selectedDeadline, setSelectedDeadline] = useState<string | null>(null);
-  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // Get unique durations
-  const uniqueDurations = Array.from(
-    new Set(
-      allProjects.map((project) => {
-        const deadlineToComplete = new Date(project.deadlineToComplete);
-        const deadlineToApply = new Date(project.deadlineToApply);
-        const diffTime = Math.abs(
-          deadlineToComplete.getTime() - deadlineToApply.getTime()
-        );
-        return Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30)); // Convert to months
-      })
-    )
-  );
-
-  // Get unique deadlines for the new dropdown
-  const uniqueDeadlines = Array.from(
-    new Set(
-      allProjects.map((project) => {
-        // Format as YYYY-MM-DD for dropdown value
-        const deadline = new Date(project.deadlineToApply);
-        return deadline.toISOString().split("T")[0];
-      })
-    )
-  ).sort(); // Sort chronologically
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleString("en-US", options);
-  };
-
-  const Searchonclick = () => {
-    const result = allProjects.filter((project) => {
-      // Always filter from allProjects
-      const deadlineToComplete = new Date(project.deadlineToComplete);
-      const deadlineToApply = new Date(project.deadlineToApply);
-      const projectDuration = Math.ceil(
-        Math.abs(deadlineToComplete.getTime() - deadlineToApply.getTime()) /
-          (1000 * 60 * 60 * 24 * 30) // Convert to months
-      );
-      const projectDeadlineDate = deadlineToApply.toISOString().split("T")[0];
-
-      return (
-        (selectedDuration === "all" ||
-          !selectedDuration ||
-          projectDuration === Number(selectedDuration)) &&
-        (selectedDomain === "all" ||
-          !selectedDomain ||
-          project.requirementTags.includes(selectedDomain)) &&
-        (selectedDifficulty === "all" ||
-          !selectedDifficulty ||
-          project.difficultyTag === selectedDifficulty) &&
-        (selectedDeadline === "all" ||
-          !selectedDeadline ||
-          projectDeadlineDate === selectedDeadline)
-      );
-    });
-
-    setProjects(result); // Update displayed projects without losing original data
-  };
-
-  const resetFilters = () => {
-    // Reset the projects to show all projects
-    setProjects(allProjects);
-
-    // Reset the filter states to null to show placeholder values
-    setSelectedDifficulty(null);
-    setSelectedDuration(null);
-    setSelectedDeadline(null);
-    setSelectedDomain(null);
-    setSearchQuery("");
-    // Also reset the search query
-  };
-
-  const filterProjectsBySearch = () => {
-    if (searchQuery.trim() === "") {
-      setProjects(allProjects); // Reset to all projects if search query is empty
-    } else {
-      const result = allProjects.filter((project) => {
-        const query = searchQuery.toLowerCase();
-        return (
-          project.title.toLowerCase().includes(query) ||
-          project.description.toLowerCase().includes(query) ||
-          project.requirementTags.some((tag) =>
-            tag.toLowerCase().includes(query)
-          )
-        );
-      });
-
-      setProjects(result.length > 0 ? result : []); // Set to empty array if no match
-    }
-  };
-
-  // Hardcoded user ID for now
-  interface ApplicationResponse {
-    message?: string;
-    error?: string;
-  }
+  const router = useRouter();
 
   async function applyForProject(
     projectId: string,
@@ -199,15 +87,12 @@ const Discovery = () => {
         }),
       });
 
-
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || data.message || "Application failed");
       }
 
-      const data: ApplicationResponse = await response.json();
       alert("Project application successful!");
-
       fetchUpdatedProjects();
     } catch (error) {
       console.error("Error applying for project:", error);
@@ -216,27 +101,19 @@ const Discovery = () => {
   }
 
   async function fetchUpdatedProjects() {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       const res = await fetch("/api/projects/All_Project");
       const data = await res.json();
-      setAllProjects(data); // Keep all projects updated
-      setProjects(data); // Update the filtered projects
+      setAllProjects(data);
+      setProjects(data);
     } catch (error) {
       console.error("Error fetching updated projects:", error);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   }
 
-  const router = useRouter();
-
-  const handleStarClick = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    projectId: string
-  ) => {
-    event.stopPropagation();
-  };
   return (
     <>
       <div className="mx-5">
@@ -247,120 +124,6 @@ const Discovery = () => {
           Browse projects from professors and research groups across various
           domains.
         </p>
-        <Input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              filterProjectsBySearch();
-              setSelectedDifficulty(null);
-              setSelectedDuration(null);
-              setSelectedDeadline(null);
-              setSelectedDomain(null);
-            }
-          }}
-          placeholder="Search projects by clicking Enter"
-          className="w-[100%] md:w-100 my-4"
-        />
-        <div className="flex flex-row flex-wrap justify-start space-x-4 space-y-3">
-          <Select
-            value={selectedDomain || ""}
-            onValueChange={setSelectedDomain}
-          >
-            <SelectTrigger className="">
-              <SelectValue placeholder="Domain" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Domain</SelectLabel>
-                <SelectItem value="all">All</SelectItem>
-                {Array.from(
-                  new Set(
-                    allProjects.flatMap((project) => project.requirementTags)
-                  ) // Flatten and remove duplicates
-                ).map((domain, index) => (
-                  <SelectItem key={index} value={domain}>
-                    {domain}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={selectedDifficulty || ""}
-            onValueChange={setSelectedDifficulty}
-          >
-            <SelectTrigger className="">
-              {/* removed fixed width to make it responsive */}
-              <SelectValue placeholder="Difficulty" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Difficulty</SelectLabel>
-                <SelectItem value="all">All</SelectItem>
-                {Array.from(
-                  new Set(allProjects.map((project) => project.difficultyTag))
-                ) // Remove duplicates
-                  .map((difficulty, index) => (
-                    <SelectItem key={index} value={difficulty}>
-                      {difficulty}
-                    </SelectItem>
-                  ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={selectedDuration || ""}
-            onValueChange={setSelectedDuration}
-          >
-            <SelectTrigger className="">
-              <SelectValue placeholder="Duration" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Duration</SelectLabel>
-                <SelectItem value="all">All</SelectItem>
-                {uniqueDurations.map((duration, index) => (
-                  <SelectItem key={index} value={String(duration)}>
-                    {duration} {duration === 1 ? "month" : "months"}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={selectedDeadline || ""}
-            onValueChange={setSelectedDeadline}
-          >
-            <SelectTrigger className="sm:w-[180px]">
-              <SelectValue placeholder="Application Deadline" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Application Deadline</SelectLabel>
-                <SelectItem value="all">All</SelectItem>
-                {uniqueDeadlines.map((deadline, index) => (
-                  <SelectItem key={index} value={deadline}>
-                    {new Date(deadline).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <div className="flex flex-row flex-wrap gap-4">
-            <Button onClick={Searchonclick}>Search</Button>
-            <Button onClick={resetFilters}>Reset Filters</Button>
-          </div>
-        </div>
         <Separator className="my-5" />
         {loading ? (
           <Loader />
@@ -392,27 +155,13 @@ const Discovery = () => {
                     <p className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2" />
                       <span className="font-semibold">Apply by:</span>{" "}
-                      {formatDate(project.deadlineToApply)}
-                    </p>
-
-                    <p>
-                      <span className="font-semibold">Duration:</span>{" "}
-                      {(() => {
-                        const deadlineToComplete = new Date(
-                          project.deadlineToComplete
-                        );
-                        const deadlineToApply = new Date(
-                          project.deadlineToApply
-                        );
-                        const diffTime = Math.abs(
-                          deadlineToComplete.getTime() -
-                            deadlineToApply.getTime()
-                        );
-                        const diffDays = Math.ceil(
-                          diffTime / (1000 * 60 * 60 * 24)
-                        );
-                        return `${diffDays} days`;
-                      })()}
+                      {new Date(project.deadlineToApply).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
                 </CardContent>
@@ -442,13 +191,6 @@ const Discovery = () => {
                       Apply
                     </Button>
                   )}
-                  <Button
-                    variant="outline"
-                    className="w-auto flex items-center"
-                    onClick={(event) => handleStarClick(event, project.id)}
-                  >
-                    <FaStar className="mr-0.5" /> Star
-                  </Button>
                 </CardFooter>
               </Card>
             ))}
