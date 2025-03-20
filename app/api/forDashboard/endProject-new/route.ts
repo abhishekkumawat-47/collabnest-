@@ -25,18 +25,36 @@ function getNewRating(oldRating: number, score: number, toughness: number): numb
 
 export async function POST(request: NextRequest) {
   try {
-    const { projectId, ratings, toughness } = await request.json();
+    const { projectId, ratings } = await request.json();
 
     console.log('Received project ID:', projectId);
     console.log('Ratings:', ratings);
 
-    // Use a transaction to ensure all operations succeed or fail together
     const result = await prisma.$transaction(async (tx) => {
       // Update project status
       const updatedProject = await tx.project.update({
         where: { id: projectId },
         data: { status: 'CLOSED' },
       });
+
+      // Fetch difficultyTag properly
+      const project = await tx.project.findUnique({
+        where: { id: projectId },
+        select: { difficultyTag: true },
+      });
+
+      if (!project) {
+        throw new Error(`Project with ID ${projectId} not found.`);
+      }
+
+      // Map difficultyTag enum to numeric toughness
+      const difficultyMapping: Record<string, number> = {
+        BEGINNER: 1,
+        INTERMEDIATE: 2,
+        ADVANCED: 3,
+      };
+
+      const toughness = difficultyMapping[project.difficultyTag] ?? 2; // Default to INTERMEDIATE
 
       // Update user ratings
       for (const [userId, score] of Object.entries(ratings)) {
@@ -54,7 +72,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Calculate new rating
-        const newRating = getNewRating(user.rating, validScore, toughness || 3);
+        const newRating = getNewRating(user.rating, validScore, toughness);
 
         console.log(`Updating rating for user ${userId}: Old=${user.rating}, New=${newRating}`);
 
@@ -71,9 +89,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error('Error ending project:', error);
-    return NextResponse.json({
-      error: 'Failed to end project',
-      message: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to end project',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
   }
 }

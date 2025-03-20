@@ -200,7 +200,7 @@ export default function Dashboard() {
   const onEndProject = async (ratings: { [userId: string]: number }) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/forDashboard/endProject/`, {
+      const response = await fetch(`/api/forDashboard/endProject-new/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
