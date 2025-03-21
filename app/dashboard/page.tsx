@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ProjectOverview } from "@/components/dashboard/ProjectOverview";
@@ -39,39 +39,89 @@ export default function Dashboard() {
   const [curr_user, setUser] = useState<User | null>(null);
   const [projectStatus, setProjectStatus] = useState<string | null>(null); // New state for project status
   const project_id = useRef("");
-  const isAuth = curr_user?.role !== "USER"; // Authentication status (should come from auth system)
-
-  const [id,setId] = useState("addd061b-6883-4bab-a355-4479bf659623"); // User ID (should come from auth system)
-
+  // Set id from session // User ID (should come from auth system)
+  // "addd061b-6883-4bab-a355-4479bf659623";
   const { data: session, status } = useSession();
   console.log(status);
-  if(status!="authenticated"){
-    window.location.href = '/welcome';
+  if (status != "authenticated") {
+    window.location.href = "/welcome";
   }
-  
+  const [id, setId] = useState("");
+  const email = session?.user?.email || "";
+
   const handleCurrentProject = (project: Project) => {
     setCurrentProject(project);
   };
+  const [isAuth, setauth] = useState<boolean>();
 
-  const fetchProjects = async () => {
+  const fetchid = async () => {
+    try {
+      const response = await fetch(`/api/forProfile/byEmail/${email}`);
+      const data: User = await response.json();
+      setId(data.id);
+      setUser(data);
+      setauth(data.role !== "USER"); // Use fresh data instead of state
+      return data.id; // Return the ID for proper sequencing
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+  // const fetchProjects = async () => {
+  //   try {
+  //     const endpoint = isAuth
+  //       ? `/api/forDashboard/byAuthor/${id}`
+  //       : `/api/forDashboard/byUserId/${id}`;
+
+  //     const response = await fetch(endpoint, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //     console.log(response);
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch projects");
+  //     }
+
+  //     const data: Project[] = await response.json();
+  //     setUserProjects(data);
+  //     console.log(UserProjects);
+
+  //     if (data.length > 0) {
+  //       if (currentProject) {
+  //         const updatedCurrentProject = data.find(
+  //           (p) => p.id === currentProject.id
+  //         );
+  //         if (updatedCurrentProject) {
+  //           setCurrentProject(updatedCurrentProject);
+  //         } else {
+  //           setCurrentProject(data[0]);
+  //         }
+  //       } else {
+  //         setCurrentProject(data[0]);
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching projects:", error);
+  //   }
+  // };
+
+  const fetchProjects = async (userId: string) => {
     try {
       const endpoint = isAuth
-        ? `/api/forDashboard/byAuthor/${id}`
-        : `/api/forDashboard/byUserId/${id}`;
-
+        ? `/api/forDashboard/byAuthor/${userId}`
+        : `/api/forDashboard/byUserId/${userId}`;
+      console.log(isAuth, endpoint);
       const response = await fetch(endpoint, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch projects");
-      }
-
       const data: Project[] = await response.json();
       setUserProjects(data);
+      console.log(UserProjects);
 
       if (data.length > 0) {
         if (currentProject) {
@@ -92,24 +142,18 @@ export default function Dashboard() {
     }
   };
 
-  const fetchUser = () => {
-    fetch(`/api/forDashboard/userDetails/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data: User) => {
-        setUser(data);
-      })
-      .catch((err) => console.log(err));
-  };
-
   useEffect(() => {
-    fetchProjects();
-    fetchUser();
-  }, [id, isAuth]); // Added isAuth as a dependency
+    const fetchData = async () => {
+      if (!email) return;
+
+      const userId = await fetchid();
+      if (!userId) return;
+
+      await fetchProjects(userId); // Pass the ID directly
+    };
+
+    fetchData();
+  }, [email, isAuth]); // Added isAuth as a dependency
 
   useEffect(() => {
     if (currentProject?.id) {
@@ -210,17 +254,17 @@ export default function Dashboard() {
           ratings,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`Failed to end project: ${response.statusText}`);
       }
-  
+
       // Update project status immediately
       setCurrentProject((prev) =>
         prev ? { ...prev, status: "CLOSED" } : prev
       );
       setProjectStatus("CLOSED"); // Update UI immediately
-  
+
       setEndProjectModalOpen(false);
     } catch (error) {
       console.error("Error ending project:", error);
@@ -228,11 +272,10 @@ export default function Dashboard() {
       setIsLoading(false);
     }
   };
-  
 
   const onIssueCertificate = () => {
     // Implement the logic to issue certificates
-    console.log('Issuing certificates for project:', currentProject?.id);
+    console.log("Issuing certificates for project:", currentProject?.id);
   };
 
   return (
@@ -299,10 +342,12 @@ export default function Dashboard() {
           isOpen={isEndProjectModalOpen}
           onClose={() => setEndProjectModalOpen(false)}
           onEndProject={onEndProject}
-          contributors={currentProject?.members.map((member) => ({
-            id: member.user.id,
-            name: member.user.name,
-          })) || []}
+          contributors={
+            currentProject?.members.map((member) => ({
+              id: member.user.id,
+              name: member.user.name,
+            })) || []
+          }
         />
       </>
 
