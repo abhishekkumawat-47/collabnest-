@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     authorId,
     } = jsonBody;
 
-
+    console.log(jsonBody);
     // Validate required fields (remove 'author' from validation)
     if (
       !title ||
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
         deadlineToComplete: completeDate,
         applicantCapacity,
         selectionCapacity,
-        subtasks:[],
+        
         
         author: {
           connect: {

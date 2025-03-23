@@ -218,7 +218,7 @@ export default function Dashboard() {
   };
 
   const onCreateProject = () => {
-    fetchProjects();
+    fetchProjects(id);
   };
 
   const onSaveTask = (updatedTasks: Subtask[]) => {
@@ -238,7 +238,7 @@ export default function Dashboard() {
   };
 
   const onSaveResources = () => {
-    fetchProjects();
+    fetchProjects(id);
   };
 
   const onEndProject = async (ratings: { [userId: string]: number }) => {
@@ -373,7 +373,11 @@ export default function Dashboard() {
               ) : null}
             </div>
 
-            <ProjectTimeline tasks={currentProject.subtasks} />
+            <ProjectTimeline
+              projectId={currentProject.id}
+              tasks={currentProject.subtasks}
+              isAuthor={isAuth}
+            />
             {isAuth ? (
               <>
                 {projectStatus !== "CLOSED" && (
