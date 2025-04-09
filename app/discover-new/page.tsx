@@ -118,6 +118,14 @@ const Discovery = () => {
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      setProjects(allProjects); // Reset to all projects if search query is empty
+    } else {
+      filterProjectsBySearch(); // Filter projects for non-empty queries
+    }
+  }, [searchQuery]); // Trigger whenever searchQuery changes
+
   // Get unique durations
   const uniqueDurations = Array.from(
     new Set(
@@ -199,22 +207,21 @@ const Discovery = () => {
   };
 
   const filterProjectsBySearch = () => {
-    if (searchQuery.trim() === "") {
-      setProjects(allProjects); // Reset to all projects if search query is empty
-    } else {
+    console.log("Filtering projects by search query:", searchQuery);// Ensure searchQuery is a string
+
+      const query = searchQuery.trim().toLowerCase(); 
+     
       const result = allProjects.filter((project) => {
-        const query = searchQuery.toLowerCase();
         return (
-          project.title.toLowerCase().includes(query) ||
-          project.description.toLowerCase().includes(query) ||
-          project.requirementTags.some((tag) =>
-            tag.toLowerCase().includes(query)
+          (project.title?.toLowerCase() || "").includes(query) || // Safely handle title
+          (project.description?.toLowerCase() || "").includes(query) || // Safely handle description
+          project.requirementTags?.some((tag) =>
+            (tag?.toLowerCase() || "").includes(query) // Safely handle requirementTags
           )
         );
       });
-
       setProjects(result.length > 0 ? result : []); // Set to empty array if no match
-    }
+    
   };
 
   // Hardcoded user ID for now
@@ -312,15 +319,6 @@ const Discovery = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              filterProjectsBySearch();
-              setSelectedDifficulty(null);
-              setSelectedDuration(null);
-              setSelectedDeadline(null);
-              setSelectedDomain(null);
-            }
-          }}
           placeholder="Search projects by clicking Enter"
           className="w-[100%] md:w-100 my-4"
         />
