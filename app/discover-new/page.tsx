@@ -24,6 +24,8 @@ import {
 import { FaStar } from "react-icons/fa";
 import { Calendar } from "lucide-react";
 import Loader from "@/components/Loader";
+import { useSession } from "next-auth/react";
+import { User } from "@/types/leaderboard";
 
 const Discovery = () => {
   type Status = "OPEN" | "CLOSED";
@@ -59,15 +61,48 @@ const Discovery = () => {
   const [loading, setLoading] = useState<boolean>(true); // Loader state
 
   const [recommendedProjectIds, setRecommendedProjectIds] = useState<string[]>([]);
+  const { data: session, status } = useSession();
+  console.log(status);
+  if (status != "authenticated") {
+    window.location.href = "/welcome";
+  }
+  const [userId, setId] = useState<string | null>(null);
 
-  const userId = "3b7f823b-dccb-47b8-b765-dcb53e8ccd66";
+
+  
+  const email = session?.user?.email || "";
+
+  const fetchid = async () => {
+    try {
+      const response = await fetch(
+        `/api/forProfile/byEmail/${session?.user?.email}`
+      );
+      const data: User = await response.json();
+      setId(data.id);
+      // Return the ID for proper sequencing
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  };
+  useEffect(() => {
+    fetchid();
+    console.log(userId);
+  }, [email]);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         // Fetch recommended project IDs
+        if (userId === null) {
+          console.log("User ID is null");
+          return;
+        }
 
+        console.log(userId);
         const recRes = await fetch(`http://127.0.0.1:8000/recommend/${userId}`);
         const recData = await recRes.json();
         const recommendedIds = recData.data || [];
@@ -108,7 +143,7 @@ const Discovery = () => {
     };
 
     fetchData();
-  }, []);
+  }, [userId]);
 
   const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(
     null
@@ -239,7 +274,7 @@ const Discovery = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          applicantId: "2be256eb-1646-4033-9d0e-2955647ba627",
+          applicantId: userId,
           projectId: projectId,
           action,
         }),
@@ -305,6 +340,8 @@ const Discovery = () => {
   ) => {
     event.stopPropagation();
   };
+
+  if (userId !== null) {
   return (
     <>
       <div className="mx-5">
@@ -488,7 +525,7 @@ const Discovery = () => {
                   <CardFooter className="flex justify-end space-x-2">
                     {project.applications
                       .map((member) => member.applicantId)
-                      .includes("2be256eb-1646-4033-9d0e-2955647ba627") ? (
+                      .includes(userId) ? (
                       <Button
                         variant="outline"
                         className="bg-black text-white"
@@ -529,5 +566,12 @@ const Discovery = () => {
     </>
   );
 };
+
+  return (
+    <div className="flex items-center justify-center h-40">
+      <h1>Loading...</h1>
+    </div>
+  );
+}
 
 export default Discovery;
