@@ -6,8 +6,8 @@ import { Send, ArrowLeft } from "lucide-react";
 import Link from 'next/link';
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-
-
+import { useSession } from "next-auth/react";
+import { User } from "@/types/leaderboard";
 
 import { useProject } from "../../../context/projectContext";
 
@@ -19,18 +19,45 @@ interface Message {
   createdAt: string;
 }
 
-interface User {
-  id: string;
-  initials: string;
-}
+
+
+
 
 export default function ChatWindowPage() {
 
   const { currentProject } = useProject();
   const projectId = currentProject?.id;
-
-  // Hardcode a "current user" for the example
-  const currentUserId = "addd061b-6883-4bab-a355-4479bf659623";
+   const { data: session, status } = useSession();
+    console.log(status);
+    if (status != "authenticated") {
+      window.location.href = "/welcome";
+    }
+    const [userId, setId] = useState<string | null>(null);
+  
+  
+    
+    const email = session?.user?.email || "";
+  
+    const fetchid = async () => {
+      try {
+        const response = await fetch(
+          `/api/forProfile/byEmail/${session?.user?.email}`
+        );
+        const data: User = await response.json();
+        console.log(data);
+        setId(data.id);
+        // Return the ID for proper sequencing
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    };
+    useEffect(() => {
+      fetchid();
+      console.log(userId);
+    }, [email]);
+  
+  const currentUserId = userId;
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
@@ -147,7 +174,7 @@ export default function ChatWindowPage() {
           </Button>
         </Link>
         <h2 className="text-xl font-semibold flex-grow">Project Chat: {projectId ? projectId.substring(0, 8) : 'Loading'}...</h2>
-        <Link href={`/project/${projectId}`}>
+        <Link href={`/projects/${projectId}`}>
           <Button variant="outline" size="sm">Project Details</Button>
         </Link>
       </div>
