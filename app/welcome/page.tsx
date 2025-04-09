@@ -13,7 +13,7 @@ export default function LandingPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     const { data: session, status } = useSession();
-    console.log("Session -----------> ", session);
+    console.log('Session -----------> ', session);
 
     // Session ----------->  {
     //     user: {
@@ -23,40 +23,10 @@ export default function LandingPage() {
     //     }
     //   }
 
-    function extractProgramCode(rollNumber:String) {
-        return rollNumber.substring(2, 4);
-    }
-
-    function getProgramName(programCode: string): string {
-        const programs: Record<string, string> = {
-          "01": "BTech",
-          "02": "MTech",
-          "11": "BSc",
-          "12": "MSc"
-        };
-        
-        return programs[programCode] || "Unknown Program";
-    }
-
-    function extractDepartment(rollNumber:String) {
-        return rollNumber.substring(4, 6);
-    }
-
-    function extractRollFromEmail(email: string) {
-        let userId = email.split("@")[0];
-        let isFirstPartInt = !isNaN(parseInt(userId[0]));
-        return isFirstPartInt ? userId.split("_")[0] : userId.split("_")[1];
-    }
-
-    function extractStartingYear(rollNumber:string) {
-        const yearPrefix = rollNumber.substring(0, 2);
-        return (2000 + parseInt(yearPrefix, 10)).toString();
-    }
-
     useEffect(() => {
         // When user is authenticated, create or check user in the database
         const createUserIfNeeded = async () => {
-            if (status === "authenticated" && session?.user?.name && session?.user?.email) {
+            if (status === 'authenticated' && session?.user?.name && session?.user?.email) {
                 setIsLoading(true);
                 try {
                     // Call your API to create the user (will handle existing emails)
@@ -68,19 +38,14 @@ export default function LandingPage() {
                         body: JSON.stringify({
                             name: session.user.name,
                             email: session.user.email,
-                            roll: extractRollFromEmail(session.user.email),
-                            department: extractDepartment(extractRollFromEmail(session.user.email)),
-                            degree: getProgramName(extractProgramCode(extractRollFromEmail(session.user.email))),
-                            year: extractStartingYear(extractRollFromEmail(session.user.email)),
                         }),
                     });
 
                     const data = await response.json();
                     console.log('User creation response:', data);
-                    
+
                     // Redirect to dashboard after user is created or verified
                     window.location.href = '/dashboard';
-                    
                 } catch (error) {
                     console.error('Error creating user:', error);
                     setIsLoading(false);
