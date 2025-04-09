@@ -11,7 +11,7 @@ export const authOptions: NextAuthOptions = {
       tenantId: process.env.AZURE_AD_TENANT_ID,
       authorization: {
         params: {
-          scope: 'openid profile email',
+          scope: 'openid profile email offline_access User.Read', // OnlineMeetings.ReadWrite  ---> after admin approval we can use this  
         },
       },
     }),
@@ -23,10 +23,19 @@ export const authOptions: NextAuthOptions = {
       }
       return false;
     },
-    async jwt({ token, profile }) {
+    async jwt({ token,account, profile }) {
       // Add user role to token
       // This is where you'd determine the user's role
       // You could check against a database, or use specific email patterns, etc.
+
+      if (account) {
+        //console.log("Account from JWT callback:", account);
+        //console.log("Access Token from Azure AD:", account?.access_token);
+        token.accessToken = account.access_token;
+        token.expiresAt = account.expires_at;
+        token.refreshToken = account.refresh_token;
+        token.tokenType = account.token_type;
+      }
       
       if (profile) {
         // Example: determine role based on email or other profile data
@@ -53,6 +62,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       // Add role and other user info to the session
+      //console.log("token" , token);
       if (token) {
         session.user = {
           ...session.user,
@@ -63,6 +73,8 @@ export const authOptions: NextAuthOptions = {
         //   role: token.role,
         //   preferredUsername: token.preferred_username,
         };
+        session.accessToken = token.accessToken;
+        //console.log("Access Token in session:", session);
       }
       return session;
     },

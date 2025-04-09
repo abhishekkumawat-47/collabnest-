@@ -8,6 +8,7 @@ export default function ProjectDetails() {
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [date, setDate] = useState("");
 
   useEffect(() => {
     async function fetchProject() {
@@ -27,6 +28,37 @@ export default function ProjectDetails() {
     if (id) fetchProject();
   }, [id]);
 
+  const handleSchedule = async () => {
+    if (!date) {
+      alert("Please select a date.");
+      return;
+    }
+
+    // Fixed meeting time: 6:00 PM
+    const startDateTime = new Date(`${date}T18:00:00`);
+    const endDateTime = new Date(startDateTime.getTime() + 30 * 60 * 1000); // 30 minutes
+
+    const res = await fetch("/api/schedule-meet", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        startDateTime: startDateTime.toISOString(),
+        endDateTime: endDateTime.toISOString(),
+        subject: `Meeting about ${project.title}`,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert(`Meeting Scheduled!\nJoin URL: ${data.meeting.joinWebUrl}`);
+    } else {
+      alert(`Failed: ${data.error}`);
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">Error: {error}</p>;
 
@@ -39,10 +71,20 @@ export default function ProjectDetails() {
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2 p-4 border rounded-lg">
           <h2 className="text-xl font-medium">Project Details</h2>
-          <p><strong>Domain:</strong> {project.requirementTags.join(", ")}</p>
-          <p><strong>Mentor:</strong> {project.author?.name}</p> {/* Replace with actual mentor */}
-          <p><strong>Difficulty:</strong> {project.difficultyTag}</p>
-          <p><strong>Slots:</strong> {project.selectionCapacity}/{project.applicantCapacity}</p>
+          <p>
+            <strong>Domain:</strong> {project.requirementTags.join(", ")}
+          </p>
+          <p>
+            <strong>Mentor:</strong> {project.author?.name}
+          </p>{" "}
+          {/* Replace with actual mentor */}
+          <p>
+            <strong>Difficulty:</strong> {project.difficultyTag}
+          </p>
+          <p>
+            <strong>Slots:</strong> {project.selectionCapacity}/
+            {project.applicantCapacity}
+          </p>
           <p className="mt-2 text-gray-600">{project.description}</p>
         </div>
 
@@ -52,7 +94,12 @@ export default function ProjectDetails() {
           <ul className="mt-2 space-y-2">
             {project.subtasks.map((subtask: any, index: number) => (
               <li key={index}>
-                <input type="checkbox" checked={subtask.completed} readOnly className="mr-2" />
+                <input
+                  type="checkbox"
+                  checked={subtask.completed}
+                  readOnly
+                  className="mr-2"
+                />
                 {subtask.title}
               </li>
             ))}
@@ -66,7 +113,11 @@ export default function ProjectDetails() {
         <ul className="mt-2 space-y-2">
           {project.projectResources.map((res: any, index: number) => (
             <li key={index}>
-              <a href={res.url} target="_blank" className="text-blue-500 underline">
+              <a
+                href={res.url}
+                target="_blank"
+                className="text-blue-500 underline"
+              >
                 {res.name} ({res.type})
               </a>
             </li>
@@ -79,20 +130,38 @@ export default function ProjectDetails() {
         {/* Ask a Question */}
         <div className="p-4 border rounded-lg">
           <h2 className="text-lg font-medium">Ask a Question</h2>
-          <input type="text" placeholder="Your Question" className="w-full mt-2 p-2 border rounded" />
-          <button className="mt-2 w-full bg-black text-white py-2 rounded">Ask</button>
+          <input
+            type="text"
+            placeholder="Your Question"
+            className="w-full mt-2 p-2 border rounded"
+          />
+          <button className="mt-2 w-full bg-black text-white py-2 rounded">
+            Ask
+          </button>
         </div>
 
         {/* Schedule Meeting */}
         <div className="p-4 border rounded-lg">
           <h2 className="text-lg font-medium">Schedule Meeting</h2>
-          <input type="date" className="w-full mt-2 p-2 border rounded" />
-          <button className="mt-2 w-full bg-black text-white py-2 rounded">Schedule</button>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full mt-2 p-2 border rounded"
+          />
+          <button
+            onClick={handleSchedule}
+            className="mt-2 w-full bg-black text-white py-2 rounded"
+          >
+            Schedule
+          </button>
         </div>
       </div>
 
       {/* Enroll Button */}
-      <button className="mt-6 w-full bg-black text-white py-3 rounded">Enroll in Project</button>
+      <button className="mt-6 w-full bg-black text-white py-3 rounded">
+        Enroll in Project
+      </button>
     </div>
   );
 }
