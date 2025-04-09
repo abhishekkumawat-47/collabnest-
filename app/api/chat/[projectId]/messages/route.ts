@@ -15,6 +15,11 @@ export async function GET(
   try {
     const messages = await prisma.message.findMany({
       where: { projectId },
+      include: {
+        sender: {
+          select: { name: true }, // Include only the sender's name
+        },
+      },
       orderBy: { createdAt: "asc" },
     });
     return NextResponse.json(messages);
@@ -45,7 +50,16 @@ export async function POST(
       },
     });
 
-    return NextResponse.json(newMessage);
+    // Fetch the sender's name separately
+    const sender = await prisma.user.findUnique({
+      where: { id: senderId },
+      select: { name: true },
+    });
+
+    return NextResponse.json({
+      ...newMessage,
+      sender: { name: sender?.name || null }, // Include the sender's name in the response
+    });
   } catch (error) {
     console.error("Error creating message:", error);
     return new NextResponse("Failed to create message", { status: 500 });
