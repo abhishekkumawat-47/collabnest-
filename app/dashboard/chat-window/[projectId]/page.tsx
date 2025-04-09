@@ -39,10 +39,8 @@ export default function ChatWindowPage() {
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   
   // Mock users data (in a real app, you would fetch this)
-  const users: Record<string, User> = {
-    "addd061b-6883-4bab-a355-4479bf659623": { id: "addd061b-6883-4bab-a355-4479bf659623", initials: "RJ" },
-    "946d962a-da03-452a-a6ec-e747cfc67aa1": { id: "946d962a-da03-452a-a6ec-e747cfc67aa1", initials: "TM" },
-  };
+  
+
 
   // Check if user is at bottom of scroll before new messages arrive
   const checkIfNearBottom = () => {
@@ -73,6 +71,7 @@ export default function ChatWindowPage() {
         // Only update if there are new messages to prevent unnecessary re-renders
         if (messages.length !== data.length || 
             (data.length > 0 && messages.length > 0 && data[data.length-1].id !== messages[messages.length-1].id)) {
+              console.log(data)
           setMessages(data);
         }
       } catch (error) {
@@ -113,8 +112,9 @@ export default function ChatWindowPage() {
       });
       if (!res.ok) throw new Error("Failed to send message");
       
-      const createdMessage = await res.json();
+      const createdMessage = { ...(await res.json()), sender: {name:"" }};
       setMessages((prev) => [...prev, createdMessage]);
+      console.log(messages)
       setNewMessage("");
     } catch (error) {
       console.error(error);
@@ -163,7 +163,7 @@ export default function ChatWindowPage() {
             <div className="space-y-4 p-4">
               {messages.map((msg) => {
                 const isCurrentUser = msg.senderId === currentUserId;
-                const user = users[msg.senderId] || { initials: "??" };
+                
                 
                 return (
                   <div 
@@ -173,11 +173,15 @@ export default function ChatWindowPage() {
                     <div className={`flex max-w-[80%] ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}>
                       <Avatar className={`${isCurrentUser ? 'ml-2' : 'mr-2'} h-8 w-8`}>
                         <AvatarFallback className="bg-blue-600 text-white text-xs">
-                          {user.initials}
+                          {msg.sender.name
+                            .split(' ')
+                            .map((word) => word[0].toUpperCase())
+                            .join('')}
                         </AvatarFallback>
                       </Avatar>
                       
                       <div>
+                          
                         <div 
                           className={`rounded-lg p-3 ${
                             isCurrentUser 
@@ -185,6 +189,11 @@ export default function ChatWindowPage() {
                               : 'bg-gray-100 text-gray-900'
                           }`}
                         >
+                          <div className={`font-bold ${
+                            isCurrentUser 
+                              && 'hidden' 
+                              
+                          }`}>{msg.sender.name}</div>
                           {msg.content}
                         </div>
                         <div className={`text-xs text-gray-500 mt-1 ${isCurrentUser ? 'text-right' : 'text-left'}`}>
