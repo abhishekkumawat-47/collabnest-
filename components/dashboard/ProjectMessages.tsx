@@ -39,9 +39,6 @@ export function ProjectMessages() {
       <CardHeader>
         <div className='flex justify-between items-center'>
           <CardTitle className='text-lg font-medium'>Recent Messages</CardTitle>
-          <Button variant='ghost' size='sm' className='text-sm'>
-            View All
-          </Button>
         </div>
         <p className='text-sm text-gray-500'>You have 265 unread messages.</p>
       </CardHeader>

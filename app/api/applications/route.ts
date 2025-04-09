@@ -196,8 +196,9 @@ export async function PUT(request: NextRequest) {
     
 
     if (result) {
-      return NextResponse.json({ error: result });
+      return NextResponse.json(result);
     }
+    
   } catch (error) {
     console.error('Error processing application:', error);
     return NextResponse.json(
