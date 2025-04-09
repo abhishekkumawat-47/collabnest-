@@ -42,7 +42,7 @@ function extractDepartment(branch: string) {
         PC: 'Electrical Engineering',
         CM: 'Electrical Engineering',
         MC: 'Mathematics',
-        CH: 'Chemical Engineering',
+        CB: 'Chemical Engineering',
         CT: 'Chemical Engineering',
         CE: 'Civil Engineering',
         GT: 'Civil Engineering',
