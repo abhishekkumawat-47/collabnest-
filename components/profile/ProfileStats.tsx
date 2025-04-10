@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, Star, BookOpen, Target } from "lucide-react";
-import { Project } from "@/types/leaderboard";
+import { Project, ProjectMember } from "@/types/leaderboard";
 import { Loader } from "./Loader";
 
 export const ProfileStats = ({ id }: { id: string }) => {
@@ -38,14 +38,14 @@ export const ProfileStats = ({ id }: { id: string }) => {
   useEffect(() => {
     if (!userData) return;
     console.log(userData);
-
+    console.log(userData?.projectCreated?.length || 0);
     setStats([
       {
         icon: Trophy,
         title: "Total Projects",
         value:
           (userData?.projectsParticipated?.length || 0) +
-          (userData?.projectsCreated?.length || 0),
+          (userData?.projectCreated?.length || 0),
       },
       {
         icon: Star,
@@ -62,10 +62,10 @@ export const ProfileStats = ({ id }: { id: string }) => {
 
     const countProjectsByDifficulty = (difficulty: string) =>
       (userData?.projectsParticipated?.filter(
-        (project: Project) =>
-          project.difficultyTag?.toUpperCase() === difficulty
+        (projectMember: ProjectMember) =>
+          projectMember.project.difficultyTag?.toUpperCase() === difficulty
       )?.length || 0) +
-      (userData?.projectsCreated?.filter(
+      (userData?.projectCreated?.filter(
         (project: Project) =>
           project.difficultyTag?.toUpperCase() === difficulty
       )?.length || 0);
