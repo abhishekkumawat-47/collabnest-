@@ -24,6 +24,8 @@ import {
 import { FaStar } from "react-icons/fa";
 import { Calendar } from "lucide-react";
 import Loader from "@/components/Loader";
+import { useSession } from "next-auth/react";
+import { User } from "@/types/leaderboard";
 
 const Discovery = () => {
   type Status = "OPEN" | "CLOSED";
@@ -57,6 +59,45 @@ const Discovery = () => {
   const [allProjects, setAllProjects] = useState<Project[]>([]); // Stores all fetched projects
   const [projects, setProjects] = useState<Project[]>([]); // Stores filtered projects
   const [loading, setLoading] = useState<boolean>(true); // Loader state
+
+
+   const { data: session, status } = useSession();
+    console.log(status);
+    if (status != "authenticated") {
+      window.location.href = "/welcome";
+    }
+    const [userId, setId] = useState<string | null>(null);
+    const [role , setRole] = useState<string | null>(null);
+    const router = useRouter();
+    
+    const email = session?.user?.email || "";
+  
+    const fetchid = async () => {
+      try {
+        const response = await fetch(
+          `/api/forProfile/byEmail/${session?.user?.email}`
+        );
+        const data: User = await response.json();
+        setRole(data.role);
+        setId(data.id);
+        // Return the ID for proper sequencing
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    };
+    useEffect(() => {
+      fetchid();
+      console.log(userId);
+    }, [email]);
+
+    useEffect(() => {
+      if (role === null) return; 
+      if (role === "USER") {
+        router.push("/discover-new");
+      }
+    }, [role, router]);
+
 
   useEffect(() => {
     setLoading(true); // Start loading
@@ -178,58 +219,6 @@ const Discovery = () => {
     }
   };
 
-  // Hardcoded user ID for now
-  interface ApplicationResponse {
-    message?: string;
-    error?: string;
-  }
-
-  async function applyForProject(
-    projectId: string,
-    action: string
-  ): Promise<void> {
-    try {
-      const response = await fetch("/api/applications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          applicantId: "2be256eb-1646-4033-9d0e-2955647ba627",
-          projectId: projectId,
-          action,
-        }),
-      });
-
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || data.message || "Application failed");
-      }
-
-      const data: ApplicationResponse = await response.json();
-      alert("Project application successful!");
-
-      fetchUpdatedProjects();
-    } catch (error) {
-      console.error("Error applying for project:", error);
-      alert("Failed to apply for project. Please try again later.");
-    }
-  }
-
-  async function fetchUpdatedProjects() {
-    setLoading(true); // Start loading
-    try {
-      const res = await fetch("/api/projects/All_Project");
-      const data = await res.json();
-      setAllProjects(data); // Keep all projects updated
-      setProjects(data); // Update the filtered projects
-    } catch (error) {
-      console.error("Error fetching updated projects:", error);
-    } finally {
-      setLoading(false); // Stop loading
-    }
-  }
-
-  const router = useRouter();
 
   const handleStarClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -240,9 +229,7 @@ const Discovery = () => {
   return (
     <>
       <div className="mx-5">
-        <h1 className="text-3xl mt-5 mb-1 font-bold">
-          Discover Recommended Projects
-        </h1>
+        <h1 className="text-3xl mt-5 mb-1 font-bold">Discover Projects</h1>
         <p className="text-muted-foreground">
           Browse projects from professors and research groups across various
           domains.
@@ -370,18 +357,23 @@ const Discovery = () => {
               <Card
                 key={project.id}
                 onClick={() => router.push(`/projects/${project.id}`)}
-                className="cursor-pointer"
+                className="cursor-pointer flex flex-col justify-between h-full shadow-md rounded-2xl transition-transform hover:scale-[1.01]"
               >
                 <CardHeader>
-                  <CardTitle className="text-2xl">{project.title}</CardTitle>
-                  <CardDescription>{project.description}</CardDescription>
+                  <CardTitle className="text-xl sm:text-2xl font-semibold">
+                    {project.title}
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    {project.description}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap mb-4">
+
+                <CardContent className="flex-grow">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {project.requirementTags.map((tag, index) => (
                       <span
                         key={index}
-                        className="bg-black text-white text-xs font-semibold mr-2 px-2.5 py-0.5 rounded mb-2"
+                        className="bg-black text-white text-xs font-semibold px-2.5 py-0.5 rounded"
                       >
                         {tag}
                       </span>
@@ -394,7 +386,6 @@ const Discovery = () => {
                       <span className="font-semibold">Apply by:</span>{" "}
                       {formatDate(project.deadlineToApply)}
                     </p>
-
                     <p>
                       <span className="font-semibold">Duration:</span>{" "}
                       {(() => {
@@ -416,38 +407,22 @@ const Discovery = () => {
                     </p>
                   </div>
                 </CardContent>
-                <CardFooter className="flex justify-end space-x-2">
-                  {project.applications
-                    .map((member) => member.applicantId)
-                    .includes("2be256eb-1646-4033-9d0e-2955647ba627") ? (
-                    <Button
-                      variant="outline"
-                      className="bg-black text-white"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        applyForProject(project.id, "withdraw");
-                      }}
-                    >
-                      Withdraw
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="bg-black text-white"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        applyForProject(project.id, "apply");
-                      }}
-                    >
-                      Apply
-                    </Button>
-                  )}
+
+                <CardFooter className="mt-auto flex justify-between items-center px-4 pb-4">
                   <Button
                     variant="outline"
-                    className="w-auto flex items-center"
+                    className="bg-black text-white px-3 py-1 text-sm"
+                    onClick={() => router.push(`/projects/${project.id}`)}
+                  >
+                    Project Details
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-1 px-3 py-1 text-sm"
                     onClick={(event) => handleStarClick(event, project.id)}
                   >
-                    <FaStar className="mr-0.5" /> Star
+                    <FaStar className="text-yellow-500" /> Star
                   </Button>
                 </CardFooter>
               </Card>

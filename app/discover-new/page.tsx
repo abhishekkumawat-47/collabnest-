@@ -59,7 +59,7 @@ const Discovery = () => {
   const [allProjects, setAllProjects] = useState<Project[]>([]); // Stores all fetched projects
   const [projects, setProjects] = useState<Project[]>([]); // Stores filtered projects
   const [loading, setLoading] = useState<boolean>(true); // Loader state
-
+  const [role , setRole] = useState<string | null>(null);
   const [recommendedProjectIds, setRecommendedProjectIds] = useState<string[]>([]);
   const { data: session, status } = useSession();
   console.log(status);
@@ -78,6 +78,7 @@ const Discovery = () => {
         `/api/forProfile/byEmail/${session?.user?.email}`
       );
       const data: User = await response.json();
+      setRole(data.role);
       setId(data.id);
       // Return the ID for proper sequencing
     } catch (err) {
@@ -89,8 +90,14 @@ const Discovery = () => {
     fetchid();
     console.log(userId);
   }, [email]);
+  const router = useRouter();
 
-
+  useEffect(() => {
+    if (role === null) return; // Wait until role is fetched
+    if (role !== "USER") {
+      router.push("/discover");
+    }
+  }, [role, router]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +108,10 @@ const Discovery = () => {
           console.log("User ID is null");
           return;
         }
-
+        if(role !== "USER"){
+          console.log("Role is not USER");
+          return;
+        }
         console.log(userId);
         const recRes = await fetch(`http://127.0.0.1:8000/recommend/${userId}`);
         const recData = await recRes.json();
@@ -335,7 +345,7 @@ const Discovery = () => {
     }
   }
 
-  const router = useRouter();
+ 
 
   const handleStarClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -475,16 +485,19 @@ const Discovery = () => {
 
                 >
                   {isRecommended && (
-                    <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-s font-bold px-3 py-1 rounded">
+                    <div className="absolute top-1 right-1 w-fit  bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-s font-bold px-3 py-1 rounded-full">
                       Recommended
                     </div>
 
                   )}
                   <CardHeader>
-                    <CardTitle className="text-2xl">{project.title}</CardTitle>
+                    <CardTitle className="text-2xl mt-2">{project.title}</CardTitle>
                     <CardDescription>{project.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
+                  <div className=" bg-black text-center text-sm w-fit px-3 font-semibold rounded-md text-white mb-4">
+                     {project.difficultyTag}
+                    </div>
                     <div className="flex flex-wrap mb-4">
                       {project.requirementTags.map((tag, index) => (
                         <span
