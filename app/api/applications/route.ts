@@ -82,6 +82,21 @@ async function applyToProject(applicantId: string, projectId: string): Promise<N
     return NextResponse.json({ error: "User has already applied for this project" }, { status: 409 });
   }
 
+  // Check if the project has reached its capacity
+  if (project.applicantCapacity <= 0) {
+    return NextResponse.json({ error: "Project has reached its applicant capacity" }, { status: 409 });
+  }
+
+  // check if the user is already a project member
+  const projectMember = await prisma.projectMember.findFirst({
+    where: {
+      userId: applicantId,
+      projectId: projectId,
+    },
+  });
+  if (projectMember) {
+    return NextResponse.json({ error: "User is already a project member" }, { status: 409 });
+  }
   // Create a new application entry
   await prisma.application.create({
     data: {

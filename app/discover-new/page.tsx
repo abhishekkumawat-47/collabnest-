@@ -485,16 +485,19 @@ const Discovery = () => {
 
                 >
                   {isRecommended && (
-                    <div className="absolute top-2 right-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-s font-bold px-3 py-1 rounded">
+                    <div className="absolute top-1 right-1 w-fit  bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-s font-bold px-3 py-1 rounded-full">
                       Recommended
                     </div>
 
                   )}
                   <CardHeader>
-                    <CardTitle className="text-2xl">{project.title}</CardTitle>
+                    <CardTitle className="text-2xl mt-2">{project.title}</CardTitle>
                     <CardDescription>{project.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
+                  <div className=" bg-black text-center text-sm w-fit px-3 font-semibold rounded-md text-white mb-4">
+                     {project.difficultyTag}
+                    </div>
                     <div className="flex flex-wrap mb-4">
                       {project.requirementTags.map((tag, index) => (
                         <span

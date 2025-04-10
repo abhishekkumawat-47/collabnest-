@@ -150,10 +150,12 @@ const EditTeamModal = ({
       console.log("Response headers:", Object.fromEntries(response.headers));
       const data = await response.json();
       console.log("Response data:", data);
-      setLoading(false);
-      alert("Application processed successfully!");
       fetchApplications(); // Refresh applications after action
       // Return updated data if successful
+       fetchProjectMembers();
+      setLoading(false);
+      alert("Application processed successfully!");
+      
 
       return data;
     } catch (err) {
@@ -228,7 +230,7 @@ const EditTeamModal = ({
       console.log(data);
       alert("Member removed successfully!");
       // Refresh the project members after removal
-      fetchProjectMembers();
+      await fetchProjectMembers();
     } catch (err) {
       console.error(err);
     }
