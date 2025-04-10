@@ -16,6 +16,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       include: {
         author: true, // Include author details if needed
         subtasks: true, // Include subtasks
+        applications: true, 
       },
     });
 
