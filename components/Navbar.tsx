@@ -89,13 +89,12 @@ export default function Navbar() {
           <Search className="h-5 w-5" />
         </Button>
 
-        
-
+        <Link href="/profile">
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-
+        </Link>
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="md:hidden">
