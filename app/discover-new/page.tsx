@@ -59,7 +59,7 @@ const Discovery = () => {
   const [allProjects, setAllProjects] = useState<Project[]>([]); // Stores all fetched projects
   const [projects, setProjects] = useState<Project[]>([]); // Stores filtered projects
   const [loading, setLoading] = useState<boolean>(true); // Loader state
-
+  const [role , setRole] = useState<string | null>(null);
   const [recommendedProjectIds, setRecommendedProjectIds] = useState<string[]>([]);
   const { data: session, status } = useSession();
   console.log(status);
@@ -78,6 +78,7 @@ const Discovery = () => {
         `/api/forProfile/byEmail/${session?.user?.email}`
       );
       const data: User = await response.json();
+      setRole(data.role);
       setId(data.id);
       // Return the ID for proper sequencing
     } catch (err) {
@@ -89,8 +90,14 @@ const Discovery = () => {
     fetchid();
     console.log(userId);
   }, [email]);
+  const router = useRouter();
 
-
+  useEffect(() => {
+    if (role === null) return; // Wait until role is fetched
+    if (role !== "USER") {
+      router.push("/discover");
+    }
+  }, [role, router]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +108,10 @@ const Discovery = () => {
           console.log("User ID is null");
           return;
         }
-
+        if(role !== "USER"){
+          console.log("Role is not USER");
+          return;
+        }
         console.log(userId);
         const recRes = await fetch(`http://127.0.0.1:8000/recommend/${userId}`);
         const recData = await recRes.json();
@@ -325,7 +335,7 @@ const Discovery = () => {
     }
   }
 
-  const router = useRouter();
+ 
 
   const handleStarClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
