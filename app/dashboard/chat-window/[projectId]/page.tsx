@@ -192,13 +192,13 @@ export default function ChatWindowPage() {
     <div className="flex flex-col h-screen bg-gray-50">
       {/* Header */}
       <div className="flex items-center p-4 bg-white border-b shadow-sm">
-        <Link href="/projects" className="mr-2">
+        <Link href="/dashboard" className="mr-2">
           <Button variant="ghost" size="icon" className="rounded-full">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
         <h2 className="text-xl font-semibold flex-grow">Project Chat: {projectId ? projectId.substring(0, 8) : 'Loading'}...</h2>
-        <Link href={`/projects/${projectId}`}>
+        <Link href={`/dashboard/${projectId}`}>
           <Button variant="outline" size="sm">Project Details</Button>
         </Link>
       </div>
