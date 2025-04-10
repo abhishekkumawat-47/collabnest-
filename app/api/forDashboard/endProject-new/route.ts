@@ -8,6 +8,7 @@ function getNewRating(oldRating: number, score: number, toughness: number): numb
   } else if (toughness === 2) {
     p = 1400;
   }
+  score=score/10;
 
   const a = 2 * score - 1;
   const b = 1.0 / (1.0 + Math.pow(10, (p - oldRating) / 400.0));
