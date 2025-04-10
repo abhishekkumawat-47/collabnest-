@@ -29,7 +29,11 @@ export async function GET(
         picture: true,
         applications: true,
         projectCreated: true,
-        projectsParticipated: true// Add more attributes as needed
+        projectsParticipated: {
+          include:{
+            project:true
+          }
+        }// Add more attributes as needed
       },
     });
 
