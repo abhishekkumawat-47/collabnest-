@@ -1,120 +1,120 @@
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["postgresqlExtensions"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-    id                       String          @id @default(uuid()) @db.Uuid
-    username                 String?         @unique
-    name                     String
-    roll                     String?         @unique
-    email                    String          @unique
-    password                 String?
-    role                     Role            @default(USER)
-    rating                   Int             @default(0)
-    degree                   String?
-    year                     String?
-    branch                   String?
-    department               String
-    picture                  String?
-    cv                       String?
-    accountCreatedAt         DateTime        @default(now())
-    accountUpdatedAt         DateTime?       @updatedAt
-    passwordChangedAt        DateTime?
-    passwordResetToken       String?
-    passwordResetTokenExpiry DateTime?
-    applications             Application[]
-    projectCreated           Project[]       @relation("ProjectAuthor")
-    projectsParticipated     ProjectMember[]
-    sentMessages             Message[]       @relation("UserMessages")
+  id                       String          @id @default(uuid()) @db.Uuid
+  username                 String?         @unique
+  name                     String
+  roll                     String?         @unique
+  email                    String          @unique
+  password                 String?
+  role                     Role            @default(USER)
+  rating                   Int             @default(0)
+  degree                   String?
+  year                     String?
+  branch                   String?
+  department               String
+  picture                  String?
+  accountCreatedAt         DateTime        @default(now())
+  passwordChangedAt        DateTime?
+  passwordResetToken       String?
+  passwordResetTokenExpiry DateTime?
+  cv                       String?
+  accountUpdatedAt         DateTime?       @updatedAt
+  applications             Application[]
+  sentMessages             Message[]       @relation("UserMessages")
+  projectCreated           Project[]       @relation("ProjectAuthor")
+  projectsParticipated     ProjectMember[]
 }
 
 model Project {
-    id                 String          @id @default(uuid()) @db.Uuid
-    authorId           String          @db.Uuid
-    title              String
-    subheading         String?
-    description        String?
-    status             Status          @default(OPEN)
-    deadlineToApply    DateTime?
-    deadlineToComplete DateTime?
-    difficultyTag      DifficultyTag
-    applicantCapacity  Int             @default(100)
-    selectionCapacity  Int             @default(10)
-    requirementTags    String[]
-    projectResources   Json[]
-    createdAt          DateTime        @default(now())
-    updatedAt          DateTime        @updatedAt
-    applications       Application[]
-    author             User            @relation("ProjectAuthor", fields: [authorId], references: [id])
-    members            ProjectMember[]
-    subtasks           Subtask[]
-    messages           Message[]
+  id                 String          @id @default(uuid()) @db.Uuid
+  authorId           String          @db.Uuid
+  title              String
+  subheading         String?
+  description        String?
+  status             Status          @default(OPEN)
+  deadlineToApply    DateTime?
+  deadlineToComplete DateTime?
+  difficultyTag      DifficultyTag
+  applicantCapacity  Int             @default(100)
+  selectionCapacity  Int             @default(10)
+  requirementTags    String[]
+  projectResources   Json[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  applications       Application[]
+  messages           Message[]
+  author             User            @relation("ProjectAuthor", fields: [authorId], references: [id])
+  members            ProjectMember[]
+  subtasks           Subtask[]
 }
 
 model Subtask {
-    id          String    @id @default(uuid()) @db.Uuid
-    title       String
-    description String?
-    status      Status    @default(OPEN)
-    deadline    DateTime?
-    projectId   String    @db.Uuid
-    project     Project   @relation(fields: [projectId], references: [id])
+  id          String    @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  status      Status    @default(OPEN)
+  deadline    DateTime?
+  projectId   String    @db.Uuid
+  project     Project   @relation(fields: [projectId], references: [id])
 }
 
 model Application {
-    id                String            @id @default(uuid()) @db.Uuid
-    projectId         String            @db.Uuid
-    applicantId       String            @db.Uuid
-    dateOfApplication DateTime          @default(now())
-    status            ApplicationStatus @default(PENDING)
-    applicant         User              @relation(fields: [applicantId], references: [id])
-    project           Project           @relation(fields: [projectId], references: [id])
+  id                String            @id @default(uuid()) @db.Uuid
+  projectId         String            @db.Uuid
+  applicantId       String            @db.Uuid
+  dateOfApplication DateTime          @default(now())
+  status            ApplicationStatus @default(PENDING)
+  applicant         User              @relation(fields: [applicantId], references: [id])
+  project           Project           @relation(fields: [projectId], references: [id])
 }
 
 model ProjectMember {
-    id        String  @id @default(uuid()) @db.Uuid
-    projectId String  @db.Uuid
-    userId    String  @db.Uuid
-    project   Project @relation(fields: [projectId], references: [id])
-    user      User    @relation(fields: [userId], references: [id])
+  id        String  @id @default(uuid()) @db.Uuid
+  projectId String  @db.Uuid
+  userId    String  @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
 }
 
 model Message {
-    id        String   @id @default(uuid()) @db.Uuid
-    senderId  String   @db.Uuid
-    projectId String   @db.Uuid
-    content   String
-    createdAt DateTime @default(now())
-    sender    User     @relation("UserMessages", fields: [senderId], references: [id])
-    project   Project  @relation(fields: [projectId], references: [id])
+  id        String   @id @default(uuid()) @db.Uuid
+  senderId  String   @db.Uuid
+  projectId String   @db.Uuid
+  content   String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id])
+  sender    User     @relation("UserMessages", fields: [senderId], references: [id])
 }
 
 enum Role {
-    USER
-    PROFESSOR
-    ADMIN
+  USER
+  PROFESSOR
+  ADMIN
 }
 
 enum Status {
-    OPEN
-    CLOSED
-    IN_PROGRESS
+  OPEN
+  CLOSED
+  IN_PROGRESS
 }
 
 enum DifficultyTag {
-    BEGINNER
-    INTERMEDIATE
-    ADVANCED
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
 }
 
 enum ApplicationStatus {
-    PENDING
-    ACCEPTED
-    REJECTED
+  PENDING
+  ACCEPTED
+  REJECTED
 }

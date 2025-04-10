@@ -8,8 +8,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { User } from "@/types/leaderboard";
-
 import { useProject } from "../../../context/projectContext";
+
 
 interface Message {
   id: string;
@@ -24,6 +24,22 @@ interface Message {
 
 
 export default function ChatWindowPage() {
+  
+  const [userInitialsMap, setUserInitialsMap] = useState<Record<string, any>>({});
+  
+  const fetchUserInitials = async (senderId: string) => {
+    if (userInitialsMap[senderId]) return; // Skip if already fetched
+  
+    try {
+      const response = await fetch(`/api/forProfile/nameByUserId/${senderId}`);
+      if (!response.ok) throw new Error("Failed to fetch user name");
+      const data = await response.json();
+      setUserInitialsMap((prev) => ({ ...prev, [senderId]: data })); // Update the map
+      
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const { currentProject } = useProject();
   const projectId = currentProject?.id;
@@ -52,6 +68,7 @@ export default function ChatWindowPage() {
         return null;
       }
     };
+
     useEffect(() => {
       fetchid();
       console.log(userId);
@@ -65,9 +82,6 @@ export default function ChatWindowPage() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
   
-  // Mock users data (in a real app, you would fetch this)
-  
-
 
   // Check if user is at bottom of scroll before new messages arrive
   const checkIfNearBottom = () => {
@@ -81,7 +95,7 @@ export default function ChatWindowPage() {
   // Handle scroll events
   const handleScroll = () => {
     setShouldAutoScroll(checkIfNearBottom());
-  };
+  }
 
   // 1) Fetch messages on mount + poll every 5 seconds
   useEffect(() => {
@@ -120,6 +134,16 @@ export default function ChatWindowPage() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, shouldAutoScroll]);
+
+  useEffect(() => {
+    const fetchInitialsForMessages = async () => {
+      for (const message of messages) {
+        await fetchUserInitials(message.senderId);
+      }
+    };
+  
+    fetchInitialsForMessages();
+  }, [messages]);
 
   // 3) Send new message
   const handleSendMessage = async () => {
@@ -188,9 +212,10 @@ export default function ChatWindowPage() {
         <Card className="border-0 shadow-sm mb-4">
           <CardContent className="p-0">
             <div className="space-y-4 p-4">
-              {messages.map((msg) => {
+              {messages.map( (msg) => {
                 const isCurrentUser = msg.senderId === currentUserId;
-                
+                const userInitials = userInitialsMap[msg.senderId]?.initial || "??";
+                const userName = userInitialsMap[msg.senderId]?.name || "Unknown User";
                 
                 return (
                   <div 
@@ -200,10 +225,7 @@ export default function ChatWindowPage() {
                     <div className={`flex max-w-[80%] ${isCurrentUser ? 'flex-row-reverse' : 'flex-row'}`}>
                       <Avatar className={`${isCurrentUser ? 'ml-2' : 'mr-2'} h-8 w-8`}>
                         <AvatarFallback className="bg-blue-600 text-white text-xs">
-                          {msg.sender.name
-                            .split(' ')
-                            .map((word) => word[0].toUpperCase())
-                            .join('')}
+                          {userInitials}
                         </AvatarFallback>
                       </Avatar>
                       
@@ -220,7 +242,7 @@ export default function ChatWindowPage() {
                             isCurrentUser 
                               && 'hidden' 
                               
-                          }`}>{msg.sender.name}</div>
+                          }`}>{userName}</div>
                           {msg.content}
                         </div>
                         <div className={`text-xs text-gray-500 mt-1 ${isCurrentUser ? 'text-right' : 'text-left'}`}>
