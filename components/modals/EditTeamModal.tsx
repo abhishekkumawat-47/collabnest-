@@ -34,6 +34,7 @@ const EditTeamModal = ({
   const [acceptedIds, setAcceptedIds] = useState<string[]>([]); // Track IDs of accepted applications
   const [rejectedIds, setRejectedIds] = useState<string[]>([]); // Track IDs of rejected applications
   const [error, setError] = useState<string | null>(null);
+  const [projectMembers, setProjectMembers] = useState<any[]>([]); // Track project members
   const router = useRouter();
   // Prevent background scrolling when the modal is open
   useEffect(() => {
@@ -53,6 +54,7 @@ const EditTeamModal = ({
   useEffect(() => {
     if (isOpen && projectData?.id && isAuthor) {
       fetchApplications();
+      fetchProjectMembers();
     }
   }, [isOpen, projectData?.id]);
 
@@ -150,6 +152,7 @@ const EditTeamModal = ({
       console.log("Response data:", data);
       setLoading(false);
       alert("Application processed successfully!");
+      fetchApplications(); // Refresh applications after action
       // Return updated data if successful
 
       return data;
@@ -194,6 +197,43 @@ const EditTeamModal = ({
     }
   };
 
+  const fetchProjectMembers = async () => {
+    try {
+      const response = await fetch(
+        `/api/forDashboard/fetchProjectMembers/${projectData.id}`
+      );
+      const data = await response.json();
+      if (!response.ok) throw new Error("Failed to fetch project members");
+
+      console.log(data);
+      setProjectMembers(data);
+    } catch (err) {
+      console.error(err);
+
+    }
+  }
+
+  const handleRemoveMember = async (userId: string) => {
+    try {
+      const response = await fetch(
+        `/api/forDashboard/fetchProjectMembers/${projectData.id}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId }),
+        }
+      );
+      if (!response.ok) throw new Error("Failed to remove project member");
+      const data = await response.json();
+      console.log(data);
+      alert("Member removed successfully!");
+      // Refresh the project members after removal
+      fetchProjectMembers();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   if (!isOpen || !projectData) return null;
 
   return (
@@ -223,6 +263,7 @@ const EditTeamModal = ({
               <div className="animate-spin mr-2 h-4 w-4 border-2 border-gray-500 rounded-full border-t-transparent"></div>
               Loading applications...
             </div>
+
           )}
           {error && (
             <p className="text-sm text-red-600 mb-4 p-2 bg-red-50 rounded">
@@ -318,9 +359,55 @@ const EditTeamModal = ({
           )}
         </div>
 
+          <div className="p-4 border-t bg-gray-50">
+          <h3 className="text-sm font-medium mb-2">Project Members:</h3>
+          {projectMembers.length === 0 ? (
+            <p className="text-sm text-gray-600">No members found.</p>
+          ) : (
+            <ul className="space-y-2">
+              {projectMembers.map((member) => (
+                <li
+                  key={member.id}
+                  className="flex items-center justify-between p-3 border rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10 border">
+                      <AvatarFallback className="bg-blue-100 text-gray-800">
+                        {member.user.name
+                          ? member.user.name
+                              .split(" ")
+                              .map((word) => word[0])
+                              .join("")
+                              .toUpperCase()
+                          : "??"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{member.user.name || "Unknown"}</p>
+                      <p className="text-xs text-gray-500">{member.user.email || "No email"}</p>
+                    </div>
+                  </div>
+                  <div>
+                    {member.user && (
+                      <Button
+                        onClick={() => handleRemoveMember(member.user.id)}
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 border-red-600 hover:bg-red-50"
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <div className="flex justify-end p-4 border-t sticky bottom-0 bg-white gap-2 shadow-md">
           <Button variant="outline" onClick={onClose} className="text-gray-700">
-            Cancel
+            close
           </Button>
           <Button
             onClick={saveChanges}
