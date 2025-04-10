@@ -11,16 +11,22 @@ import { LeaderboardEntry } from '@/types/leaderboard';
 import { LeaderboardUserAvatar } from '@/components/leaderboard/LeaderboardUserAvatar';
 import { LeaderboardUserDomains } from '@/components/leaderboard/LeaderboardUserDomains';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[];
 }
 
 export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ entries }) => {
+
+  
+
+
   if (!entries || !Array.isArray(entries)) {
     return <div>No data available</div>;
   }
 
+  
  
 
   return (

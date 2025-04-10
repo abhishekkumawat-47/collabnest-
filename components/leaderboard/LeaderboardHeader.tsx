@@ -11,7 +11,7 @@ export const LeaderboardHeader = () => {
       </p>
       
       <LeaderboardSearchBar />
-      <LeaderboardFilters />
+      {/* <LeaderboardFilters /> */}
     </div>
   );
 };

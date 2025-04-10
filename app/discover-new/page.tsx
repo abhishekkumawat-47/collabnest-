@@ -153,10 +153,69 @@ const Discovery = () => {
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  useEffect(() => {
+    const applyFilters = () => {
+      console.log("Applying filters...");
+
+      const query = searchQuery.trim().toLowerCase();
+
+      const result = allProjects.filter((project) => {
+        const deadlineToComplete = new Date(project.deadlineToComplete);
+        const deadlineToApply = new Date(project.deadlineToApply);
+        const projectDuration = Math.ceil(
+          Math.abs(deadlineToComplete.getTime() - deadlineToApply.getTime()) /
+          (1000 * 60 * 60 * 24 * 30) // Convert to months
+        );
+        const projectDeadlineDate = deadlineToApply.toISOString().split("T")[0];
+
+        // Apply all filters
+        const matchesSearchQuery =
+          query === "" ||
+          (project.title?.toLowerCase() || "").includes(query) ||
+          (project.description?.toLowerCase() || "").includes(query) ||
+          project.requirementTags?.some((tag) =>
+            (tag?.toLowerCase() || "").includes(query)
+          );
+
+        const matchesDifficulty =
+          selectedDifficulty === "all" ||
+          !selectedDifficulty ||
+          project.difficultyTag === selectedDifficulty;
+
+        const matchesDuration =
+          selectedDuration === "all" ||
+          !selectedDuration ||
+          projectDuration === Number(selectedDuration);
+
+        const matchesDeadline =
+          selectedDeadline === "all" ||
+          !selectedDeadline ||
+          projectDeadlineDate === selectedDeadline;
+
+        const matchesDomain =
+          selectedDomain === "all" ||
+          !selectedDomain ||
+          project.requirementTags.includes(selectedDomain);
+
+        return (
+          matchesSearchQuery &&
+          matchesDifficulty &&
+          matchesDuration &&
+          matchesDeadline &&
+          matchesDomain
+        );
+      });
+
+      setProjects(result.length > 0 ? result : []); // Set to empty array if no match
+    };
+
+    applyFilters();
+  }, [searchQuery, selectedDifficulty, selectedDuration, selectedDeadline, selectedDomain, allProjects]); // Trigger whenever any filter state changes
+
   // Get unique durations
   const uniqueDurations = Array.from(
     new Set(
-      allProjects.map((project) => {
+      projects.map((project) => {
         const deadlineToComplete = new Date(project.deadlineToComplete);
         const deadlineToApply = new Date(project.deadlineToApply);
         const diffTime = Math.abs(
@@ -170,7 +229,7 @@ const Discovery = () => {
   // Get unique deadlines for the new dropdown
   const uniqueDeadlines = Array.from(
     new Set(
-      allProjects.map((project) => {
+      projects.map((project) => {
         // Format as YYYY-MM-DD for dropdown value
         const deadline = new Date(project.deadlineToApply);
         return deadline.toISOString().split("T")[0];
@@ -190,36 +249,6 @@ const Discovery = () => {
     return new Date(dateString).toLocaleString("en-US", options);
   };
 
-  const Searchonclick = () => {
-    const result = allProjects.filter((project) => {
-      // Always filter from allProjects
-      const deadlineToComplete = new Date(project.deadlineToComplete);
-      const deadlineToApply = new Date(project.deadlineToApply);
-      const projectDuration = Math.ceil(
-        Math.abs(deadlineToComplete.getTime() - deadlineToApply.getTime()) /
-        (1000 * 60 * 60 * 24 * 30) // Convert to months
-      );
-      const projectDeadlineDate = deadlineToApply.toISOString().split("T")[0];
-
-      return (
-        (selectedDuration === "all" ||
-          !selectedDuration ||
-          projectDuration === Number(selectedDuration)) &&
-        (selectedDomain === "all" ||
-          !selectedDomain ||
-          project.requirementTags.includes(selectedDomain)) &&
-        (selectedDifficulty === "all" ||
-          !selectedDifficulty ||
-          project.difficultyTag === selectedDifficulty) &&
-        (selectedDeadline === "all" ||
-          !selectedDeadline ||
-          projectDeadlineDate === selectedDeadline)
-      );
-    });
-
-    setProjects(result); // Update displayed projects without losing original data
-  };
-
   const resetFilters = () => {
     // Reset the projects to show all projects
     setProjects(allProjects);
@@ -231,25 +260,6 @@ const Discovery = () => {
     setSelectedDomain(null);
     setSearchQuery("");
     // Also reset the search query
-  };
-
-  const filterProjectsBySearch = () => {
-    if (searchQuery.trim() === "") {
-      setProjects(allProjects); // Reset to all projects if search query is empty
-    } else {
-      const result = allProjects.filter((project) => {
-        const query = searchQuery.toLowerCase();
-        return (
-          project.title.toLowerCase().includes(query) ||
-          project.description.toLowerCase().includes(query) ||
-          project.requirementTags.some((tag) =>
-            tag.toLowerCase().includes(query)
-          )
-        );
-      });
-
-      setProjects(result.length > 0 ? result : []); // Set to empty array if no match
-    }
   };
 
   // Hardcoded user ID for now
@@ -298,7 +308,7 @@ const Discovery = () => {
       // setProjects(data); // Update the filtered projects
       const projRes = await fetch("/api/projects/All_Project");
       const projData = await projRes.json();
-     
+
 
       // Separate top 3 recommended projects
       const topRecommended = projData.filter((project: Project) =>
@@ -313,7 +323,7 @@ const Discovery = () => {
       // Merge both lists with top 3 first
       setProjects([...topRecommended, ...remainingProjects]);
       setAllProjects([...topRecommended, ...remainingProjects]);
-     
+
 
 
 
@@ -349,15 +359,6 @@ const Discovery = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              filterProjectsBySearch();
-              setSelectedDifficulty(null);
-              setSelectedDuration(null);
-              setSelectedDeadline(null);
-              setSelectedDomain(null);
-            }
-          }}
           placeholder="Search projects by clicking Enter"
           className="w-[100%] md:w-100 my-4"
         />
@@ -375,7 +376,7 @@ const Discovery = () => {
                 <SelectItem value="all">All</SelectItem>
                 {Array.from(
                   new Set(
-                    allProjects.flatMap((project) => project.requirementTags)
+                    projects.flatMap((project) => project.requirementTags)
                   ) // Flatten and remove duplicates
                 ).map((domain, index) => (
                   <SelectItem key={index} value={domain}>
@@ -399,7 +400,7 @@ const Discovery = () => {
                 <SelectLabel>Difficulty</SelectLabel>
                 <SelectItem value="all">All</SelectItem>
                 {Array.from(
-                  new Set(allProjects.map((project) => project.difficultyTag))
+                  new Set(projects.map((project) => project.difficultyTag))
                 ) // Remove duplicates
                   .map((difficulty, index) => (
                     <SelectItem key={index} value={difficulty}>
@@ -455,7 +456,6 @@ const Discovery = () => {
           </Select>
 
           <div className="flex flex-row flex-wrap gap-4">
-            <Button onClick={Searchonclick}>Search</Button>
             <Button onClick={resetFilters}>Reset Filters</Button>
           </div>
         </div>
