@@ -5,8 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
-
-
+import { Loader } from "./Loader";
 
 interface Project {
   id: string;
@@ -16,7 +15,7 @@ interface Project {
   deadlineToComplete?: string;
 }
 
-export const CompletedProjects = ({id}:{id:string}) => {
+export const CompletedProjects = ({ id }: { id: string }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,53 +40,63 @@ export const CompletedProjects = ({id}:{id:string}) => {
     fetchCompletedProjects();
   }, []);
 
-  if (loading) return <p>Loading completed projects...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (loading)
+    return (
+      <Card className='mb-6'>
+        <div className='flex items-center justify-center h-32'>
+          <Loader center text='Loading Completed Projects...' />
+        </div>
+      </Card>
+    );
+  if (error) return <p className='text-red-500'>{error}</p>;
 
   const displayedProjects = showAll ? projects : projects.slice(0, 2);
 
   return (
-    <Card className="mb-6">
+    <Card className='mb-6'>
       <CardHeader>
         <CardTitle>Completed Projects</CardTitle>
       </CardHeader>
       <CardContent>
         {projects.length === 0 ? (
-          <p className="text-muted-foreground">No completed projects found.</p>
+          <p className='text-muted-foreground'>No completed projects found.</p>
         ) : (
           <>
             {displayedProjects.map((project) => (
               <div
                 key={project.id}
-                className="flex justify-between items-center py-4 border-b last:border-b-0 gap-3"
-              >
+                className='flex justify-between items-center py-4 border-b last:border-b-0 gap-3'>
                 <div>
-                  <div className="font-medium">{project.title}</div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className='font-medium'>{project.title}</div>
+                  <div className='text-sm text-muted-foreground'>
                     {project.description || "No description available"}
                   </div>
-                  <div className="mt-2 flex space-x-2">
+                  <div className='mt-2 flex space-x-2'>
                     {project.requirementTags.map((domain) => (
-                      <Badge key={`item-${Date.now()}-${Math.random()}`} variant="outline">
+                      <Badge
+                        key={`item-${Date.now()}-${Math.random()}`}
+                        variant='outline'>
                         {domain}
                       </Badge>
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-col items-center lg:space-x-2 lg:flex-row gap-y-2">
-                  <span className="text-sm text-center text-muted-foreground">
+                <div className='flex flex-col items-center lg:space-x-2 lg:flex-row gap-y-2'>
+                  <span className='text-sm text-center text-muted-foreground'>
                     {project.deadlineToComplete
-                      ? new Date(project.deadlineToComplete).toLocaleDateString()
+                      ? new Date(
+                          project.deadlineToComplete
+                        ).toLocaleDateString()
                       : "N/A"}
                   </span>
-                  <Button variant="outline" size="icon">
-                    <Eye className="h-4 w-4" />
+                  <Button variant='outline' size='icon'>
+                    <Eye className='h-4 w-4' />
                   </Button>
                 </div>
               </div>
             ))}
             {projects.length > 2 && (
-              <Button variant="link" onClick={() => setShowAll(!showAll)}>
+              <Button variant='link' onClick={() => setShowAll(!showAll)}>
                 {showAll ? "View Less" : "View More"}
               </Button>
             )}

@@ -17,31 +17,21 @@ export async function GET(
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
-        id: true,
-        email: true, // Include only necessary fields
         name: true,  
-        roll: true,
-        role: true,
-        department: true,
-        branch: true,
-        degree: true,
-        rating: true,
-        picture: true,
-        applications: true,
-        projectCreated: true,
-        projectsParticipated: {
-          include:{
-            project:true
-          }
-        }// Add more attributes as needed
       },
     });
-
+    
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    const initial = user.name
+      .split(' ')
+      .map((word: string) => word[0].toUpperCase())
+      .join('');
+    
+
+    return NextResponse.json({ initial : initial, name : user.name});
   } catch (error) {
     console.error('Error fetching user details:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
