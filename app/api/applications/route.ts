@@ -129,13 +129,6 @@ async function withdrawFromProject(applicantId: string, projectId: string): Prom
   // Delete the found application
   await prisma.application.delete({ where: { id: application.id } });
 
-  // Update the project capacity
-  await prisma.project.update({
-    where: { id: projectId },
-    data: {
-      applicantCapacity: { increment: 1 }, // Increase applicantCapacity
-    },
-  });
   // Optionally, remove the user from project members if they were added
   const projectMember = await prisma.projectMember.findFirst({
     where: {
@@ -145,6 +138,13 @@ async function withdrawFromProject(applicantId: string, projectId: string): Prom
   });
   if (projectMember) {
     await prisma.projectMember.delete({ where: { id: projectMember.id } });
+     // Update the project capacity
+  await prisma.project.update({
+    where: { id: projectId },
+    data: {
+      applicantCapacity: { increment: 1 }, // Increase applicantCapacity
+    },
+  });
   }
 
   return NextResponse.json({ message: "Withdrawn from project successfully!" }, { status: 200 });

@@ -78,7 +78,7 @@ const EditProjectModal = ({
           <h2 className='text-lg font-medium'>Edit project details</h2>
           <Button
             onClick={onClose}
-            className='text-gray-500 hover:text-gray-700'>
+            className='text-gray-100 hover:text-gray-50 bg-gray-800'>
             <svg
               width='20'
               height='20'

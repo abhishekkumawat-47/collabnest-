@@ -30,7 +30,7 @@ const EndProjectModal: React.FC<EndProjectModalProps> = ({ isOpen, onClose, onEn
         <p>Are you sure you want to end this project?</p>
         <p>Please rate all contributors out of 10:</p>
         {contributors.map((contributor, index) => (
-          <div key={`${contributor.id}-${index}`} className="mb-4">
+          <div key={`${contributor.id}-${index}`} className="mb-4 mt-5 font-semibold">
             <label>{contributor.name}</label>
             <input
               type="number"
@@ -42,7 +42,7 @@ const EndProjectModal: React.FC<EndProjectModalProps> = ({ isOpen, onClose, onEn
             />
           </div>
         ))}
-        <EndButton onClick={handleEndProject} className="mt-4 bg-red-600 text-white">
+        <EndButton onClick={handleEndProject} className="mt-4 bg-red-600 hover:bg-red-700 transition-colors duration-100 ease-in text-white">
           End Project
         </EndButton>
       </div>

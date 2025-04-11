@@ -38,7 +38,7 @@ const AccessLearningLinksModal = ({
           </h2>
           <Button
             onClick={onClose}
-            className='text-white hover:bg-white/20 rounded-full p-2 transition-colors'
+            className='text-black bg-white hover:text-white rounded-full p-2 transition-colors'
             aria-label='Close modal'>
             <svg
               xmlns='http://www.w3.org/2000/svg'

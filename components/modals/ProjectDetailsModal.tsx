@@ -63,7 +63,7 @@ const ProjectDetailsModal = ({
           <Button
             onClick={onClose}
             variant='ghost'
-            className='text-white hover:bg-blue-700'>
+            className='text-white hover:bg-white rounded-md hover:text-blue-600 transition duration-200 ease-in-out'>
             <X size={24} />
           </Button>
         </div>
