@@ -194,7 +194,7 @@ const LearningMaterialsModal = ({
           <h2 className='text-lg font-medium'>Learning Materials</h2>
           <Button
             onClick={handleClose}
-            className='text-gray-500 hover:text-gray-700'>
+            className='text-white'>
             <svg
               width='20'
               height='20'

@@ -32,7 +32,7 @@ export function ProjectMessages() {
     },
   ];
 
-  const projectId = "b37e8403-9944-462f-9964-5674386007a6"; // Define the projectId variable
+  const projectId = "b37e8403-9944-462f-9964-5674386007a6";
 
   return (
     <Card className='mb-6'>
@@ -40,7 +40,7 @@ export function ProjectMessages() {
         <div className='flex justify-between items-center'>
           <CardTitle className='text-lg font-medium'>Recent Messages</CardTitle>
         </div>
-        <p className='text-sm text-gray-500'>You have 265 unread messages.</p>
+        <p className='text-sm text-gray-500'>You might have unread messages.</p>
       </CardHeader>
       <CardContent className='space-y-4'>
         {messages.map((msg, index) => (

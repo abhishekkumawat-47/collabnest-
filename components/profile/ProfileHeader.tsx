@@ -63,11 +63,11 @@ export const ProfileHeader = ({ id }: { id: string }) => {
           <p className='text-sm text-muted-foreground'>{userData?.email}</p>
         </div>
       </div>
-      <div className='flex space-x-2'>
+      {/* <div className='flex space-x-2'>
         <Button variant='outline' size='icon'>
           <Edit className='h-4 w-4' />
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 };

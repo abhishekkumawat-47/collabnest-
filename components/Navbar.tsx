@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/sheet";
 
 export default function Navbar() {
-  const [showSearchMobile, setShowSearchMobile] = useState(false);
+  // const [showSearchMobile, setShowSearchMobile] = useState(false);
 
-  const toggleSearchMobile = () => {
-    setShowSearchMobile(!showSearchMobile);
-  };
+  // const toggleSearchMobile = () => {
+  //   setShowSearchMobile(!showSearchMobile);
+  // };
 
   return (
     <nav className="flex items-center justify-between px-4 md:px-9 bg-white text-gray-600 h-16 relative">
@@ -54,7 +54,7 @@ export default function Navbar() {
       </div>
 
 
-      {showSearchMobile && (
+      {/* {showSearchMobile && (
         <div className="absolute inset-0 flex items-center  bg-white px-4 h-16 z-10">
           <Input 
             type="text" 
@@ -71,23 +71,23 @@ export default function Navbar() {
             <X className="h-5 w-5" />
           </Button>
         </div>
-      )}
+      )} */}
 
       
       <div className="flex items-center space-x-2">
         
-        <div className="hidden md:block xl:w-64 md:w-40">
+        {/* <div className="hidden md:block xl:w-64 md:w-40">
           <Input type="text" placeholder="Search..." />
-        </div>
+        </div> */}
 
-        <Button 
+        {/* <Button 
           variant="ghost" 
           size="icon" 
           className="md:hidden" 
           onClick={toggleSearchMobile}
         >
           <Search className="h-5 w-5" />
-        </Button>
+        </Button> */}
 
         <Link href="/profile">
         <Avatar>
