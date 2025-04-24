@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
-import NextAuthSessionProvider from "@/components/providers/SessionProvider";
+import AuthContext from "./context/authContext";
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from './api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/authOptions';
+import { IsClientCtxProvider } from "./context/isClientContext";
 
 
 const geistSans = Geist({
@@ -34,11 +35,14 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NextAuthSessionProvider session={session}>
-        <NavbarWrapper />
-        {children}
-        </NextAuthSessionProvider>
+        <AuthContext session={session}>
+          <NavbarWrapper />
+          <IsClientCtxProvider>
+            {children}
+          </IsClientCtxProvider>
+        </AuthContext>
       </body>
     </html>
   );
 }
+/* vi: set et sw=2: */

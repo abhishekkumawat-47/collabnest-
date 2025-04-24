@@ -1,6 +1,7 @@
 // npx prisma db seed
 
 import prisma from '../config/prismaClient';
+import { DifficultyTag } from "@/types/leaderboard.ts";
 
 const students = [
     { name: 'Alice Verma', degree: 'BTech', year: '2024', branch: 'CS', serial: '01' },
@@ -112,7 +113,7 @@ async function generateProjects() {
         return;
     }
 
-    const difficulties = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
+    const difficulties: DifficultyTag[] = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
     const tags = [
         'AI',
         'ML',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
-import { useLeaderboardContext } from '@/app/leaderboard/page';
+import { useLeaderboardContext } from '@/app/context/leaderboardContext';
 
 export const LeaderboardSearchBar = () => {
   const { searchQuery, setSearchQuery } = useLeaderboardContext();

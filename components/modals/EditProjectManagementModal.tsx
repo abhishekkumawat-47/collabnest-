@@ -12,7 +12,7 @@ const EditProjectModal = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  projectData: Project;
+  projectData: Project | null;
   onSave: (data: {
     project_id: string;
     title: string;
@@ -40,7 +40,7 @@ const EditProjectModal = ({
   const handleSave = () => {
     onClose();
     onSave({
-      project_id: projectData.id,
+      project_id: projectData!.id,
       title,
       description,
       tags,

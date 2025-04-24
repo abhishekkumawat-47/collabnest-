@@ -3,14 +3,7 @@ import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-
-interface Resource {
-  id: string;
-  name: string;
-  url: string;
-  file: File | null;
-  type: "doc" | "link";
-}
+import { Resource } from "@/types/leaderboard"
 
 const LearningMaterialsModal = ({
   id,

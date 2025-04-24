@@ -75,8 +75,8 @@ async function generateCertificate(user: any, projectId: string) {
     // });
 }
 
-export async function POST(req: NextRequest, { params }: { params: { projectId: string } }) {
-    const projectId = params.projectId;
+export async function POST(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
+    const { projectId } = await params;
 
     try {
         const projectMember = await prisma.projectMember.findFirst({

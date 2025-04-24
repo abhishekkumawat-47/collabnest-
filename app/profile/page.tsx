@@ -10,11 +10,13 @@ import { CVSection } from "@/components/profile/CVSection";
 import { useSession } from "next-auth/react";
 import { User } from "@/types/leaderboard";
 import { Loader } from "@/components/profile/Loader";
+import { useIsClient } from "../context/isClientContext";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
-  console.log(status);
-  if (status != "authenticated") {
+  const isClient = useIsClient();
+  //console.log(status);
+  if (isClient && status != "authenticated") {
     window.location.href = "/welcome";
   }
   const [userId, setId] = useState<string | null>(null);

@@ -26,6 +26,7 @@ import { Calendar } from "lucide-react";
 import Loader from "@/components/Loader";
 import { useSession } from "next-auth/react";
 import { User } from "@/types/leaderboard";
+import { useIsClient } from "../context/isClientContext";
 
 const Discovery = () => {
   type Status = "OPEN" | "CLOSED";
@@ -59,11 +60,12 @@ const Discovery = () => {
   const [allProjects, setAllProjects] = useState<Project[]>([]); // Stores all fetched projects
   const [projects, setProjects] = useState<Project[]>([]); // Stores filtered projects
   const [loading, setLoading] = useState<boolean>(true); // Loader state
+  const isClient = useIsClient();
 
 
    const { data: session, status } = useSession();
     console.log(status);
-    if (status != "authenticated") {
+    if (isClient && status != "authenticated") {
       window.location.href = "/welcome";
     }
     const [userId, setId] = useState<string | null>(null);

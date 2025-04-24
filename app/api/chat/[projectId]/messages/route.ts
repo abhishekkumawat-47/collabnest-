@@ -8,9 +8,9 @@ const prisma = new PrismaClient();
 // POST /api/chat/[projectId]/messages
 export async function GET(
   request: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
-  const { projectId } = params;
+  const { projectId } = await params;
 
   try {
     const messages = await prisma.message.findMany({
@@ -31,9 +31,9 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
-  const { projectId } = params;
+  const { projectId } = await params;
   try {
     const body = await request.json();
     const { senderId, content } = body;

@@ -6,8 +6,8 @@ import { ProfileBadges } from "@/components/profile/ProfileBadges";
 import { CompletedProjects } from "@/components/profile/CompletedProjects";
 import { UserDetails } from "@/components/profile/UserDetails";
 import { CVSection } from "@/components/profile/CVSection";
-export default function ProfilePage({ params }: { params: { userId: string } }) {
-    const { userId } = params;
+export default async function ProfilePage({ params }: { params: Promise<{ userId: string }> }) {
+    const { userId } = await params;
   
     return (
       <>

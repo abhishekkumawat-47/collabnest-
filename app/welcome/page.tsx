@@ -5,11 +5,19 @@ import { colors } from '@/const';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
-export default function LandingPage() {
+function SearchParamComponent() {
     const params = useSearchParams();
     const error = params.get('error');
+    return <>
+        {error === 'not-iitp' && (
+            <p style={{ color: 'red' }}>❌ Only @iitp.ac.in email addresses are allowed.</p>
+        )}
+        </>;
+}
+
+export default function LandingPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     const { data: session, status } = useSession();
@@ -109,9 +117,9 @@ export default function LandingPage() {
                                 Microsoft
                             </button>
                         )}
-                        {error === 'not-iitp' && (
-                            <p style={{ color: 'red' }}>❌ Only @iitp.ac.in email addresses are allowed.</p>
-                        )}
+                        <Suspense>
+                            <SearchParamComponent />
+                        </Suspense>
                     </div>
                     {/* Terms of Service */}
                     <div className="mt-4 md:mt-6 text-center text-sm text-gray-500">
@@ -130,3 +138,4 @@ export default function LandingPage() {
         </div>
     );
 }
+/* vi: set et sw=4: */

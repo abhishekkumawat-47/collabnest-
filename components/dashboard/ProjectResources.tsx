@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Link as LinkIcon } from "lucide-react";
 import AccessLearningLinksModal from "../modals/AccessLearningLinksModal";
+import { Resource } from "@/types/leaderboard";
 
-export function ProjectResources({ resources }: { resources: JSON[] }) {
+export function ProjectResources({ resources }: { resources: Resource[] }) {
   const [showAll, setShowAll] = useState(false);
   const [showResources, setShowResources] = useState(false);
   // Display all resources if showAll is true, otherwise only show the first 3

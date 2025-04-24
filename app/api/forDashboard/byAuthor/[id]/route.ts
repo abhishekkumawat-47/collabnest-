@@ -2,8 +2,8 @@ import { NextResponse, NextRequest } from 'next/server';
 import { getUserProjectsById } from '@/controllers/ForDashboard.ts';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-   const { id } = params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+   const { id } = await params;
        try {
            const user = await prisma.user.findUnique({
                where: { id },

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 
-const withRole = (WrappedComponent, allowedRoles) => {
+/*const withRole = (WrappedComponent, allowedRoles) => {
   return (props) => {
     const router = useRouter();
     const userType = 1; // Replace this with actual user type fetching logic
@@ -15,4 +15,4 @@ const withRole = (WrappedComponent, allowedRoles) => {
   };
 };
 
-export default withRole;
+export default withRole;*/
