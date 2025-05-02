@@ -14,7 +14,7 @@ export interface LeaderboardEntry {
     "REJECTED"
 
   
-   export interface Subtask {
+export interface Subtask {
     id          :string  
     title       :string
     description :string
@@ -24,8 +24,8 @@ export interface LeaderboardEntry {
     project     :Project   
 }
 
-   export interface Project {
-      id              :   string        
+export interface Project {
+    id              :   string
     authorId          : string         
     title             : string
     subheading        : string
@@ -37,50 +37,60 @@ export interface LeaderboardEntry {
     applicantCapacity :number             
     selectionCapacity : number            
     requirementTags   : string[]
-    projectResources  : JSON[]
+    projectResources  : Resource[]
     subtasks           :Subtask[]        
     createdAt         : string       
     updatedAt         : string       
     applications      : Application[]
     author            : User            
     members           : ProjectMember[]
-    }
-
-    export interface Application {
-    id               : string            
-    projectId        : string            
-    applicantId      : string            
-    dateOfApplication: string       
-    status           : ApplicationStatus 
-    applicant        : User              
-    project           :Project           }
-    export interface User {
-    id               :       string         
-    username          :       string          
-    name              :       string
-    roll              :       string       
-    email             :       string         
-    password          :       string
-    role              :       Role            
-    rating            :       number             
-    degree            :       string
-    year              :       string
-    branch            :       string
-    department        :       string
-    picture           :       string
-    accountCreatedAt   :      string        
-    passwordChangedAt   :     string
-    passwordResetToken    :   string
-    passwordResetTokenExpiry: string
-    applications      :       Application[]
-    projectCreated       :    Project[]       
-    projectsParticipated  :   ProjectMember[]
 }
 
-     export interface ProjectMember {
-    id    : string  
-    projectId :string  
-    userId :  string 
-    project :  Project 
-    user     : User  
-    }
+export interface Application {
+  id               : string            
+  projectId        : string            
+  applicantId      : string            
+  dateOfApplication: string       
+  status           : ApplicationStatus 
+  applicant        : User              
+  project           :Project
+}
+
+export interface User {
+  id               :       string
+  username          :       string
+  name              :       string
+  roll              :       string
+  email             :       string
+  password          :       string
+  role              :       Role
+  rating            :       number
+  degree            :       string
+  year              :       string
+  branch            :       string
+  department        :       string
+  picture           :       string
+  accountCreatedAt   :      string
+  passwordChangedAt   :     string
+  passwordResetToken    :   string
+  passwordResetTokenExpiry: string
+  applications      :       Application[]
+  projectCreated       :    Project[]
+  projectsParticipated  :   ProjectMember[]
+}
+
+export interface ProjectMember {
+  id    : string
+  projectId :string
+  userId :  string
+  project :  Project
+  user     : User
+}
+
+export interface Resource {
+  id: string;
+  name: string;
+  url: string;
+  file: File | null;
+  type: "doc" | "link";
+}

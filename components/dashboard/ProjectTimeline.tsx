@@ -48,7 +48,7 @@ export function ProjectTimeline({
         task.id === taskId
           ? { ...task, status: newStatus.replace("_", " ") }
           : task
-      );
+      ) as Subtask[];
 
       setLocalTasks(updatedTasks);
 

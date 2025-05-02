@@ -26,6 +26,7 @@ import { Calendar } from "lucide-react";
 import Loader from "@/components/Loader";
 import { useSession } from "next-auth/react";
 import { User } from "@/types/leaderboard";
+import { useIsClient } from "../context/isClientContext";
 
 const Discovery = () => {
   type Status = "OPEN" | "CLOSED";
@@ -62,8 +63,9 @@ const Discovery = () => {
   const [role , setRole] = useState<string | null>(null);
   const [recommendedProjectIds, setRecommendedProjectIds] = useState<string[]>([]);
   const { data: session, status } = useSession();
+  const isClient = useIsClient();
   console.log(status);
-  if (status != "authenticated") {
+  if (isClient && status != "authenticated") {
     window.location.href = "/welcome";
   }
   const [userId, setId] = useState<string | null>(null);
@@ -113,7 +115,7 @@ const Discovery = () => {
           return;
         }
         console.log(userId);
-        const recRes = await fetch(`http://127.0.0.1:8000/recommend/${userId}`);
+        const recRes = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/recommend/${userId}`);
         const recData = await recRes.json();
         const recommendedIds = recData.data || [];
         console.log(recommendedIds);

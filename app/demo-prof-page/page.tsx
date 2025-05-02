@@ -3,12 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-interface ApplicationActionProps {
-  projectId: string;
-  applicationId: string;
-}
-
-export default function ApplicationAction({ projectId, applicationId }: ApplicationActionProps) {
+export default function ApplicationAction() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();

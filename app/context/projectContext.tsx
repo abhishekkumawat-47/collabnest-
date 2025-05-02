@@ -1,10 +1,10 @@
 "use client";
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { Project } from "@/types/leaderboard.ts";
 
 interface ProjectContextType {
   currentProject: Project | null;
-  setCurrentProject: (project: Project | null) => void;
+  setCurrentProject: React.Dispatch<React.SetStateAction<Project | null>>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(

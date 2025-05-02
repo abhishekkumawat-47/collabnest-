@@ -18,6 +18,7 @@ import { Project, Subtask, User, Role } from "@/types/leaderboard.ts";
 import Loader from "@/components/Loader";
 import { useSession } from "next-auth/react";
 import { useProject } from "../context/projectContext";
+import { useIsClient } from "../context/isClientContext";
 
 export default function Dashboard() {
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
@@ -42,8 +43,9 @@ export default function Dashboard() {
   // Set id from session // User ID (should come from auth system)
   // "addd061b-6883-4bab-a355-4479bf659623";
   const { data: session, status } = useSession();
-  console.log(status);
-  if (status != "authenticated") {
+  const isClient = useIsClient();
+  // console.log(status);
+  if (isClient && status != "authenticated") {
     window.location.href = "/welcome";
   }
   const [id, setId] = useState("");
@@ -52,7 +54,7 @@ export default function Dashboard() {
   const handleCurrentProject = (project: Project) => {
     setCurrentProject(project);
   };
-  const [isAuth, setauth] = useState<boolean>();
+  const [isAuth, setauth] = useState<boolean>(false);
 
   const fetchid = async () => {
     try {
@@ -260,8 +262,8 @@ export default function Dashboard() {
       }
 
       // Update project status immediately
-      setCurrentProject((prev) =>
-        prev ? { ...prev, status: "CLOSED" } : prev
+      setCurrentProject((prev: Project | null) =>
+        prev ? { ...prev, status: "CLOSED" } as Project | null : prev
       );
       setProjectStatus("CLOSED"); // Update UI immediately
 

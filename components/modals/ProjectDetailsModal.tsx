@@ -9,7 +9,7 @@ import {
   CheckSquare,
   PieChart,
 } from "lucide-react";
-import { Project } from "@/types/leaderboard";
+import { Project, Status } from "@/types/leaderboard";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { Separator } from "../ui/separator";
@@ -39,7 +39,7 @@ const ProjectDetailsModal = ({
     (task) => task.status === "CLOSED"
   ).length;
   const inProgressTasks = proj.subtasks.filter(
-    (task) => task.status === "IN_PROGRESS"
+    (task) => task.status === "IN_PROGRESS" as Status
   ).length;
   const upcomingTasks = proj.subtasks.filter(
     (task) => task.status === "OPEN"

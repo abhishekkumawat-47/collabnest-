@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect } from "react";
-import {  useRouter , usePathname  } from "next/navigation";
+import { useRouter , usePathname } from "next/navigation";
 
-import { useRive} from "rive-react";
+import { useRive } from "rive-react";
 
 
 const Loader = () => {

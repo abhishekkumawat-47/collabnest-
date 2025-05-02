@@ -1,13 +1,13 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { getUserProjectsById } from '@/controllers/ForDashboard.ts';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         if (!params) {
             return NextResponse.json({ error: 'Params are required' }, { status: 400 });
         }
 
-        const { id } = params;
+        const { id } = await params;
 
         if (!id) {
             return NextResponse.json({ error: 'User ID is required' }, { status: 400 });

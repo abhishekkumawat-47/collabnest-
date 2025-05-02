@@ -26,7 +26,7 @@ const EditTeamModal = ({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  projectData: Project;
+  projectData: Project | null;
   isAuthor: boolean;
 }) => {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -62,7 +62,7 @@ const EditTeamModal = ({
     try {
       setLoading(true);
       const response = await fetch(
-        `/api/forDashboard/fetch_applications/${projectData.id}`
+        `/api/forDashboard/fetch_applications/${projectData!.id}`
       );
       if (!response.ok) throw new Error(await response.text());
 
@@ -78,10 +78,6 @@ const EditTeamModal = ({
   };
 
   const { data: session, status } = useSession();
-  console.log(status);
-  if (status != "authenticated") {
-    window.location.href = "/welcome";
-  }
   const [userId, setId] = useState<string | null>(null);
 
   const email = session?.user?.email || "";
@@ -113,7 +109,7 @@ const EditTeamModal = ({
       setLoading(true);
       setError(null);
 
-      console.log(userId, projectData.id, action);
+      // console.log(userId, projectData.id, action);
 
       const response = await fetch(`/api/applications`, {
         method: "PUT",
@@ -122,7 +118,7 @@ const EditTeamModal = ({
         },
         body: JSON.stringify({
           action,
-          projectId: projectData.id,
+          projectId: projectData!.id,
           applicationId: applicationId,
         }),
       });
@@ -202,7 +198,7 @@ const EditTeamModal = ({
   const fetchProjectMembers = async () => {
     try {
       const response = await fetch(
-        `/api/forDashboard/fetchProjectMembers/${projectData.id}`
+        `/api/forDashboard/fetchProjectMembers/${projectData!.id}`
       );
       const data = await response.json();
       if (!response.ok) throw new Error("Failed to fetch project members");
@@ -218,7 +214,7 @@ const EditTeamModal = ({
   const handleRemoveMember = async (userId: string) => {
     try {
       const response = await fetch(
-        `/api/forDashboard/fetchProjectMembers/${projectData.id}`,
+        `/api/forDashboard/fetchProjectMembers/${projectData!.id}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -289,7 +285,7 @@ const EditTeamModal = ({
                       <AvatarFallback className="bg-gray-100 text-gray-800">
                         {application.applicant.name
                           .split(" ")
-                          .map((word) => word[0])
+                          .map((word: string) => word[0])
                           .join("")
                           .toUpperCase()}
                       </AvatarFallback>
@@ -378,7 +374,7 @@ const EditTeamModal = ({
                         {member.user.name
                           ? member.user.name
                               .split(" ")
-                              .map((word) => word[0])
+                              .map((word: string) => word[0])
                               .join("")
                               .toUpperCase()
                           : "??"}

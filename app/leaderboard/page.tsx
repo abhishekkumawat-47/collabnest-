@@ -5,17 +5,7 @@ import { LeaderboardHeader } from '@/components/leaderboard/LeaderboardHeader';
 import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable';   
 import { Card, CardContent } from "@/components/ui/card";
 import { LeaderboardEntry } from '@/types/leaderboard';
-
-// Contexts
-const LeaderboardContext = createContext<{
-  filteredEntries: LeaderboardEntry[];
-  searchQuery: string;
-  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
-}>({
-  filteredEntries: [],
-  searchQuery: "",
-  setSearchQuery: () => {},
-});
+import { LeaderboardContext, useLeaderboardContext } from '../context/leaderboardContext';
 
 export default function LeaderboardPage() {
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
@@ -88,6 +78,3 @@ export default function LeaderboardPage() {
     </LeaderboardContext.Provider>
   );
 }
-
-// Custom hook for consuming the context
-export const useLeaderboardContext = () => useContext(LeaderboardContext);
