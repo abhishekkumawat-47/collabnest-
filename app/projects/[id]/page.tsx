@@ -13,9 +13,9 @@ export default function ProjectDetails() {
   const [role, setRole] = useState<string | null>(null);
   const [buttonLoading, setButtonLoading] = useState(false);
 
-
+ // console.log(useParams() , "params");
   const projectId = id as string; // Ensure projectId is a string
-
+ // console.log(projectId , "id from params");
   const { data: session, status } = useSession();
   console.log(status);
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function ProjectDetails() {
   }, [email]);
   async function fetchProject() {
     try {
-      const res = await fetch(`/api/projects/${id}`);
+      const res = await fetch(`/api/projects/${projectId}`);
       if (!res.ok) throw new Error("Failed to fetch project");
 
       const data = await res.json();
