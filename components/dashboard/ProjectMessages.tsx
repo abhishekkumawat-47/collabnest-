@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
 
 export function ProjectMessages() {
   const messages = [
@@ -43,7 +44,7 @@ export function ProjectMessages() {
         <p className='text-sm text-gray-500'>You might have unread messages.</p>
       </CardHeader>
       <CardContent className='space-y-4'>
-        {messages.map((msg, index) => (
+        {/* {messages.map((msg, index) => (
           <div
             key={index}
             className={`flex gap-3 ${
@@ -64,10 +65,19 @@ export function ProjectMessages() {
               <p className='text-sm text-gray-600 truncate'>{msg.message}</p>
             </div>
           </div>
-        ))}
+        ))} */}
+       
+          <Image
+            src='chat.svg'
+            alt='No messages'
+            width={60}
+            height={60}
+            className='mx-auto my-8'
+          />
+        
         <Link
         href={`/dashboard/chat-window/${projectId}`}
-        className="text-blue-600 underline"
+        className="text-blue-600 underline mt-5"
       >
         View All Messages
       </Link>

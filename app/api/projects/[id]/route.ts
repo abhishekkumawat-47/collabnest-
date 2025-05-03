@@ -4,9 +4,11 @@ import { NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 // GET: Fetch project details by ID
-export async function GET(req: Request, { params }: { params: Promise<{ projectId: string }> }) {
+export async function GET(req: Request, { params }: { params: { projectId: string } })
+{
   try {
-    const { projectId } = await params; // Use ID as string
+    const { projectId } = params;
+    console.log("Project ID:", projectId);
     if (!projectId) {
       return NextResponse.json({ error: "Invalid project ID" }, { status: 400 });
     }
