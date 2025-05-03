@@ -79,7 +79,7 @@ export default function ProjectDetails() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           applicantId: userId,
-          projectId: id,
+          projectId: projectId,
           action,
         }),
       });
