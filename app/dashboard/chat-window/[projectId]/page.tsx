@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { User } from "@/types/leaderboard";
 import { useProject } from "../../../context/projectContext";
+import ProjectDetailsModal from '@/components/modals/ProjectDetailsModal';
 
 
 interface Message {
@@ -184,7 +185,8 @@ export default function ChatWindowPage() {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const [details, setDetails] = useState(false);
+  const [details1, setDetails1] = useState(false);
+
 
   return (
     
@@ -198,9 +200,17 @@ export default function ChatWindowPage() {
           </Button>
         </Link>
         <h2 className="text-xl font-semibold flex-grow">Project Chat: {projectId ? projectId.substring(0, 8) : 'Loading'}...</h2>
-        <Link href={`/dashboard/${projectId}`}>
-          <Button variant="outline" size="sm">Project Details</Button>
-        </Link>
+        <Button variant='outline' onClick={() => setDetails1(true)} size='sm'>
+          Project Details
+        </Button>
+
+        {details1 && (
+          <ProjectDetailsModal
+            isOpen={details1}
+            onClose={() => setDetails1(false)}
+            proj={currentProject}
+          />
+        )}
       </div>
 
       {/* Messages container */}
